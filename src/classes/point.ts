@@ -1,9 +1,14 @@
 import { Shape } from './shape'
-import { Errors } from '../utils/errors'
 import { Box } from './box'
 import { Matrix } from './matrix'
-import { LT, EQ, EQ_0 } from '../utils/utils'
+import { LT, EQ, EQ_0, GT } from '../utils/utils'
 import { SimplePoint } from './types'
+import { Line } from './line'
+import { Vector } from './vector'
+import { Segment } from './segment'
+import { Errors } from '../utils/errors'
+import { Distance } from '../algorithms/distance'
+
 // import { Vector } from './vector'
 
 /**
@@ -111,37 +116,37 @@ export class Point extends Shape<Point> implements SimplePoint {
     return new Point(m.transform([this.x, this.y]))
   }
 
-  //   /**
-  //    * Returns projection point on given line
-  //    * @param {Line} line Line this point be projected on
-  //    * @returns {Point}
-  //    */
-  //   projectionOn(line) {
-  //     if (this.equalTo(line.pt))
-  //       // this point equal to line anchor point
-  //       return this.clone()
+  /**
+   * Returns projection point on given line
+   * @param {Line} line Line this point be projected on
+   * @returns {Point}
+   */
+  projectionOn(line: Line): Point {
+    if (this.equalTo(line.pt))
+      // this point equal to line anchor point
+      return this.clone()
 
-  //     const vec = new Vector(this, line.pt)
-  //     if (EQ_0(vec.cross(line.norm)))
-  //       // vector to point from anchor point collinear to normal vector
-  //       return line.pt.clone()
+    const vec = new Vector(this, line.pt)
+    if (EQ_0(vec.cross(line.norm)))
+      // vector to point from anchor point collinear to normal vector
+      return line.pt.clone()
 
-  //     const dist = vec.dot(line.norm) // signed distance
-  //     const proj_vec = line.norm.multiply(dist)
-  //     return this.translate(proj_vec)
-  //   }
+    const dist = vec.dot(line.norm) // signed distance
+    const projVec = line.norm.multiply(dist)
+    return this.translate(projVec)
+  }
 
-  //   /**
-  //    * Returns true if point belongs to the "left" semi-plane, which means, point belongs to the same semi plane where line normal vector points to
-  //    * Return false if point belongs to the "right" semi-plane or to the line itself
-  //    * @param {Line} line Query line
-  //    * @returns {boolean}
-  //    */
-  //   leftTo(line) {
-  //     const vec = new Vector(line.pt, this)
-  //     const onLeftSemiPlane = GT(vec.dot(line.norm), 0)
-  //     return onLeftSemiPlane
-  //   }
+  /**
+   * Returns true if point belongs to the "left" semi-plane, which means, point belongs to the same semi plane where line normal vector points to
+   * Return false if point belongs to the "right" semi-plane or to the line itself
+   * @param line Query line
+   * @returns true if point belongs to the "left" semi-plane
+   */
+  leftTo(line: Line): boolean {
+    const vec = new Vector(line.pt, this)
+    const onLeftSemiPlane = GT(vec.dot(line.norm), 0)
+    return onLeftSemiPlane
+  }
 
   /**
    * Calculate distance and shortest segment from point to shape and return as array [distance, shortest segment]
@@ -149,76 +154,81 @@ export class Point extends Shape<Point> implements SimplePoint {
    * @returns {number} distance from point to shape
    * @returns {Segment} shortest segment between point and shape (started at point, ended at shape)
    */
-  //   distanceTo(shape) {
-  //     if (shape instanceof Point) {
-  //       const dx = shape.x - this.x
-  //       const dy = shape.y - this.y
-  //       return [Math.sqrt(dx * dx + dy * dy), new Flatten.Segment(this, shape)]
-  //     }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  distanceTo(shape: Shape<any>): [number, Segment] {
+    if (shape instanceof Point) {
+      const dx = shape.x - this.x
+      const dy = shape.y - this.y
+      return [Math.sqrt(dx * dx + dy * dy), new Segment(this, shape)]
+    }
 
-  //     if (shape instanceof Flatten.Line) {
-  //       return Flatten.Distance.point2line(this, shape)
-  //     }
+    if (shape instanceof Line) {
+      return Distance.point2line(this, shape)
+    }
 
-  //     if (shape instanceof Flatten.Circle) {
-  //       return Flatten.Distance.point2circle(this, shape)
-  //     }
+    //     if (shape instanceof Flatten.Circle) {
+    //       return Flatten.Distance.point2circle(this, shape)
+    //     }
 
-  //     if (shape instanceof Flatten.Segment) {
-  //       return Flatten.Distance.point2segment(this, shape)
-  //     }
+    if (shape instanceof Segment) {
+      return Distance.point2segment(this, shape)
+    }
 
-  //     if (shape instanceof Flatten.Arc) {
-  //       return Flatten.Distance.point2arc(this, shape)
-  //     }
+    //     if (shape instanceof Flatten.Arc) {
+    //       return Flatten.Distance.point2arc(this, shape)
+    //     }
 
-  //     if (shape instanceof Flatten.Polygon) {
-  //       return Flatten.Distance.point2polygon(this, shape)
-  //     }
+    //     if (shape instanceof Flatten.Polygon) {
+    //       return Flatten.Distance.point2polygon(this, shape)
+    //     }
 
-  //     if (shape instanceof Flatten.PlanarSet) {
-  //       return Flatten.Distance.shape2planarSet(this, shape)
-  //     }
-  //   }
+    //     if (shape instanceof Flatten.PlanarSet) {
+    //       return Flatten.Distance.shape2planarSet(this, shape)
+    //     }
+
+    throw Errors.OPERATION_IS_NOT_SUPPORTED
+  }
 
   /**
-   * Returns true if point is on a shape, false otherwise
+   * Check if point belongs to the shape
    * @param {Shape} shape
-   * @returns {boolean}
+   * @returns Returns true if point is on a shape, false otherwise
    */
-  //   on(shape) {
-  //     if (shape instanceof Flatten.Point) {
-  //       return this.equalTo(shape)
-  //     }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  on(shape: Shape<any>): boolean {
+    if (shape instanceof Point) {
+      return this.equalTo(shape)
+    }
 
-  //     if (shape instanceof Flatten.Box) {
-  //       return shape.contains(this)
-  //     }
+    if (shape instanceof Box) {
+      return shape.contains(this)
+    }
 
-  //     if (shape instanceof Flatten.Line) {
-  //       return shape.contains(this)
-  //     }
+    if (shape instanceof Line) {
+      return shape.contains(this)
+    }
 
-  //     if (shape instanceof Flatten.Ray) {
-  //       return shape.contains(this)
-  //     }
+    // if (shape instanceof Flatten.Ray) {
+    //   return shape.contains(this)
+    // }
 
-  //     if (shape instanceof Flatten.Circle) {
-  //       return shape.contains(this)
-  //     }
+    // if (shape instanceof Flatten.Circle) {
+    //   return shape.contains(this)
+    // }
 
-  //     if (shape instanceof Flatten.Segment) {
-  //       return shape.contains(this)
-  //     }
+    if (shape instanceof Segment) {
+      return shape.contains(this)
+    }
 
-  //     if (shape instanceof Flatten.Arc) {
-  //       return shape.contains(this)
-  //     }
+    // if (shape instanceof Flatten.Arc) {
+    //   return shape.contains(this)
+    // }
 
-  //     if (shape instanceof Flatten.Polygon) {
-  //       return shape.contains(this)
-  //     }
-  //   }
+    // if (shape instanceof Flatten.Polygon) {
+    //   return shape.contains(this)
+    // }
+    return false
+  }
 
   get name() {
     return 'point'

@@ -1,23 +1,4 @@
-import {
-  Point,
-  Vector,
-  // Circle,
-  // Line,
-  // Segment,
-  // Arc,
-  // Box,
-  // Polygon,
-  // Edge,
-  // Face,
-  // Ray,
-  point,
-  vector
-  // circle,
-  // line,
-  // segment,
-  // arc,
-  // ray
-} from '../index'
+import { Point, Vector, point, vector } from '../index'
 import { Errors } from '../utils/errors'
 import { EQ } from '../utils/utils'
 

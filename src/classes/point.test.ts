@@ -1,4 +1,7 @@
+import { Line } from './line'
+import { matrix } from './matrix'
 import { point, Point } from './point'
+import { Segment } from './segment'
 import { Vector } from './vector'
 
 describe('Point', function () {
@@ -66,53 +69,53 @@ describe('Point', function () {
     const scaledPoint = point.scale(2, 2)
     expect(scaledPoint).toEqual({ x: 4, y: 6 })
   })
-  // it('Method returns projection point on given line', function () {
-  //   const anchor = new Point(1, 1)
-  //   const norm = new Vector(0, 1)
-  //   const line = new Line(anchor, norm)
-  //   const pt = new Point(2, 2)
-  //   const proj_pt = pt.projectionOn(line)
-  //   expect(proj_pt).to.deep.equal({ x: 2, y: 1 })
-  // })
-  // it('Method transform returns new point transformed by affine transformation matrix', function () {
-  //   const pt = point(4, 1)
-  //   const pc = point(1, 1)
-  //   // Transform coordinate origin into point x,y, then rotate, then transform origin back
-  //   const m = matrix()
-  //     .translate(pc.x, pc.y)
-  //     .rotate((3 * Math.PI) / 2)
-  //     .translate(-pc.x, -pc.y)
-  //   const transformed_pt = pt.transform(m)
-  //   const expected_pt = point(1, -2)
-  //   expect(transformed_pt.equalTo(expected_pt)).to.be.true
-  // })
+  it('Method returns projection point on given line', function () {
+    const anchor = new Point(1, 1)
+    const norm = new Vector(0, 1)
+    const line = new Line(anchor, norm)
+    const pt = new Point(2, 2)
+    const projectedPoint = pt.projectionOn(line)
+    expect(projectedPoint).toEqual({ x: 2, y: 1 })
+  })
+  it('Method transform returns new point transformed by affine transformation matrix', function () {
+    const pt = point(4, 1)
+    const pc = point(1, 1)
+    // Transform coordinate origin into point x,y, then rotate, then transform origin back
+    const m = matrix()
+      .translate(pc.x, pc.y)
+      .rotate((3 * Math.PI) / 2)
+      .translate(-pc.x, -pc.y)
+    const transformedPoint = pt.transform(m)
+    const expectedPoint = point(1, -2)
+    expect(transformedPoint.equalTo(expectedPoint)).toBe(true)
+  })
+})
 
-  // describe('#Flatten.Point.Distance methods', function () {
-  //   it('Method distanceTo return distance to other point', function () {
-  //     const point1 = new Point(1, 1)
-  //     const point2 = new Point(2, 2)
-  //     const [dist, shortest_segment] = point1.distanceTo(point2)
-  //     expect(dist).to.equal(Math.sqrt(2))
-  //   })
-  //   it('Method distanceTo calculates distance to given line', function () {
-  //     const anchor = new Point(1, 1)
-  //     const norm = new Vector(0, 1)
-  //     const line = new Line(anchor, norm)
-  //     const pt = new Point(2, 2)
-  //     expect(pt.distanceTo(line)[0]).to.equal(1)
-  //   })
-  //   it('Method distanceTo returns distance to segment', function () {
-  //     const ps = new Point(-2, 2)
-  //     const pe = new Point(2, 2)
-  //     const segment = new Segment(ps, pe)
-  //     const pt1 = new Point(2, 4) /* point in segment scope */
-  //     const pt2 = new Point(-5, 2) /* point is out of segment scope */
-  //     const pt3 = new Point(6, 2) /* point is out of segment scope */
-
-  //     expect(pt1.distanceTo(segment)[0]).to.equal(2)
-  //     expect(pt2.distanceTo(segment)[0]).to.equal(3)
-  //     expect(pt3.distanceTo(segment)[0]).to.equal(4)
-  //   })
+describe('Point.Distance methods', function () {
+  it('Method distanceTo return distance to other point', function () {
+    const point1 = new Point(1, 1)
+    const point2 = new Point(2, 2)
+    const [dist] = point1.distanceTo(point2)
+    expect(dist).toEqual(Math.sqrt(2))
+  })
+  it('Method distanceTo calculates distance to given line', function () {
+    const anchor = new Point(1, 1)
+    const norm = new Vector(0, 1)
+    const line = new Line(anchor, norm)
+    const pt = new Point(2, 2)
+    expect(pt.distanceTo(line)[0]).toEqual(1)
+  })
+  it('Method distanceTo returns distance to segment', function () {
+    const ps = new Point(-2, 2)
+    const pe = new Point(2, 2)
+    const segment = new Segment(ps, pe)
+    const pt1 = new Point(2, 4) /* point in segment scope */
+    const pt2 = new Point(-5, 2) /* point is out of segment scope */
+    const pt3 = new Point(6, 2) /* point is out of segment scope */
+    expect(pt1.distanceTo(segment)[0]).toEqual(2)
+    expect(pt2.distanceTo(segment)[0]).toEqual(3)
+    expect(pt3.distanceTo(segment)[0]).toEqual(4)
+  })
   //   it('Method distanceTo returns distance to circle', function () {
   //     const circle = new Circle(new Point(), 3)
   //     const pt1 = new Point(5, 0)
@@ -138,38 +141,36 @@ describe('Point', function () {
   //       point(120, 350),
   //       point(70, 120)
   //     ]
-
   //     const poly = new Polygon()
   //     poly.addFace(points)
-
   //     const pt = point(300, 50)
   //     expect(pt.distanceTo(poly)[0]).to.equal(25)
   //   })
-  // })
-  // describe('#Flatten.Point.On inclusion queries', function () {
-  //   it('Method "on" returns true if point checked with same points', function () {
-  //     const pt = new Point(0, 1)
-  //     expect(pt.on(pt.clone())).to.equal(true)
-  //   })
-  //   it('Method "on" returns true if point belongs to line', function () {
-  //     const pt1 = new Point(1, 1)
-  //     const pt2 = new Point(2, 2)
-  //     const pt3 = new Point(3, 3)
-  //     const line = new Line(pt1, pt2)
-  //     expect(pt3.on(line)).to.equal(true)
-  //   })
+})
+describe('Point.On inclusion queries', function () {
+  it('Method "on" returns true if point checked with same points', function () {
+    const pt = new Point(0, 1)
+    expect(pt.on(pt.clone())).toEqual(true)
+  })
+  it('Method "on" returns true if point belongs to line', function () {
+    const pt1 = new Point(1, 1)
+    const pt2 = new Point(2, 2)
+    const pt3 = new Point(3, 3)
+    const line = new Line(pt1, pt2)
+    expect(pt3.on(line)).toEqual(true)
+  })
   //   it('Method "on" returns true if point belongs to circle', function () {
   //     const pt = new Point(0, 1)
   //     const circle = new Circle(new Point(0, 0), 2)
   //     expect(pt.on(circle)).to.equal(true)
   //   })
-  //   it('Method "on" returns true if point belongs to segment', function () {
-  //     const pt1 = new Point(1, 1)
-  //     const pt2 = new Point(2, 2)
-  //     const pt3 = new Point(3, 3)
-  //     const segment = new Line(pt1, pt3)
-  //     expect(pt2.on(segment)).to.equal(true)
-  //   })
+  it('Method "on" returns true if point belongs to segment', function () {
+    const pt1 = new Point(1, 1)
+    const pt2 = new Point(2, 2)
+    const pt3 = new Point(3, 3)
+    const segment = new Line(pt1, pt3)
+    expect(pt2.on(segment)).toEqual(true)
+  })
   //   it('Method "on" returns true if point belongs to arc', function () {
   //     const arc = new Arc(new Point(), 1, -Math.PI / 4, Math.PI / 4, false)
   //     const pt = new Point(-1, 0)
@@ -185,27 +186,24 @@ describe('Point', function () {
   //       point(120, 350),
   //       point(70, 120)
   //     ]
-
   //     const poly = new Polygon()
   //     poly.addFace(points)
   //     poly.addFace([circle(point(175, 150), 30).toArc()])
-
   //     const pt1 = point(300, 50)
   //     const pt2 = point(50, 75)
   //     const pt3 = point(180, 160)
   //     const pt4 = point(140, 250)
-
   //     expect(pt1.on(poly)).to.equal(false)
   //     expect(pt2.on(poly)).to.equal(false)
   //     expect(pt3.on(poly)).to.equal(false)
   //     expect(pt4.on(poly)).to.equal(true)
   //   })
   // })
-  // it('Method leftTo returns true if point is on the "left" semi plane, which is the side of the normal vector', function () {
-  //   const line = new Line(new Point(-1, -1), new Point(1, 1))
-  //   const pt1 = new Point(-2, 2)
-  //   const pt2 = new Point(3, 1)
-  //   expect(pt1.leftTo(line)).to.equal(true)
-  //   expect(pt2.leftTo(line)).to.equal(false)
-  // })
+  it('Method leftTo returns true if point is on the "left" semi plane, which is the side of the normal vector', function () {
+    const line = new Line(new Point(-1, -1), new Point(1, 1))
+    const pt1 = new Point(-2, 2)
+    const pt2 = new Point(3, 1)
+    expect(pt1.leftTo(line)).toEqual(true)
+    expect(pt2.leftTo(line)).toEqual(false)
+  })
 })

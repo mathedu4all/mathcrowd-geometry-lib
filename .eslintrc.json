@@ -30,8 +30,7 @@
   "root": true,
   "rules": {
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
-    "camelcase": "error",
-    "import/no-cycle": "warn"
+    "camelcase":"error"
   },
   "settings": {
     "import/resolver": {
