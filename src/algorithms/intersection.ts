@@ -1,8 +1,11 @@
+import { Arc } from '../classes/arc'
 import { Box } from '../classes/box'
+import { Circle } from '../classes/circle'
 import { Line } from '../classes/line'
 import { Point } from '../classes/point'
 import { Segment } from '../classes/segment'
-import { EQ_0, GE, LE } from '../utils/utils'
+import { Vector } from '../classes/vector'
+import { EQ, EQ_0, GE, GT, LE, LT } from '../utils/utils'
 
 export function intersectLine2Line(line1: Line, line2: Line): Point[] {
   const ip = []
@@ -24,60 +27,60 @@ export function intersectLine2Line(line1: Line, line2: Line): Point[] {
   return ip
 }
 
-// export function intersectLine2Circle(line, circle) {
-//   const ip = []
-//   const prj = circle.pc.projectionOn(line) // projection of circle center on a line
-//   const dist = circle.pc.distanceTo(prj)[0] // distance from circle center to projection
+export function intersectLine2Circle(line: Line, circle: Circle): Point[] {
+  const ip: Point[] = []
+  const prj = circle.pc.projectionOn(line) // projection of circle center on a line
+  const dist = circle.pc.distanceTo(prj)[0] // distance from circle center to projection
 
-//   if (EQ(dist, circle.r)) {
-//     // line tangent to circle - return single intersection point
-//     ip.push(prj)
-//   } else if (LT(dist, circle.r)) {
-//     // return two intersection points
-//     const delta = Math.sqrt(circle.r * circle.r - dist * dist)
-//     let v_trans, pt
+  if (EQ(dist, circle.r)) {
+    // line tangent to circle - return single intersection point
+    ip.push(prj)
+  } else if (LT(dist, circle.r)) {
+    // return two intersection points
+    const delta = Math.sqrt(circle.r * circle.r - dist * dist)
+    let transVec, pt
 
-//     v_trans = line.norm.rotate90CCW().multiply(delta)
-//     pt = prj.translate(v_trans)
-//     ip.push(pt)
+    transVec = line.norm.rotate90CCW().multiply(delta)
+    pt = prj.translate(transVec)
+    ip.push(pt)
 
-//     v_trans = line.norm.rotate90CW().multiply(delta)
-//     pt = prj.translate(v_trans)
-//     ip.push(pt)
-//   }
-//   return ip
-// }
+    transVec = line.norm.rotate90CW().multiply(delta)
+    pt = prj.translate(transVec)
+    ip.push(pt)
+  }
+  return ip
+}
 
-// export function intersectLine2Box(line: Line, box: Box) {
-//   const ips = []
-//   for (const seg of box.toSegments()) {
-//     const ips_tmp = intersectSegment2Line(seg, line)
-//     for (const pt of ips_tmp) {
-//       if (!ptInIntPoints(pt, ips)) {
-//         ips.push(pt)
-//       }
-//     }
-//   }
-//   return ips
-// }
+export function intersectLine2Box(line: Line, box: Box): Point[] {
+  const ips = []
+  for (const seg of box.toSegments()) {
+    const ipsTmp = intersectSegment2Line(seg, line)
+    for (const pt of ipsTmp) {
+      if (!ptInIntPoints(pt, ips)) {
+        ips.push(pt)
+      }
+    }
+  }
+  return ips
+}
 
-// export function intersectLine2Arc(line, arc) {
-//   const ip = []
+export function intersectLine2Arc(line: Line, arc: Arc): Point[] {
+  const ips: Point[] = []
 
-//   if (intersectLine2Box(line, arc.box).length === 0) {
-//     return ip
-//   }
+  if (intersectLine2Box(line, arc.box).length === 0) {
+    return ips
+  }
 
-//   const circle = new Circle(arc.pc, arc.r)
-//   const ip_tmp = intersectLine2Circle(line, circle)
-//   for (const pt of ip_tmp) {
-//     if (pt.on(arc)) {
-//       ip.push(pt)
-//     }
-//   }
+  const circle = new Circle(arc.pc, arc.r)
+  const ipsTmp = intersectLine2Circle(line, circle)
+  for (const pt of ipsTmp) {
+    if (pt.on(arc)) {
+      ips.push(pt)
+    }
+  }
 
-//   return ip
-// }
+  return ips
+}
 
 export function intersectSegment2Line(seg: Segment, line: Line): Point[] {
   const ip = []
@@ -195,225 +198,230 @@ function isPointInSegmentBox(point: Point, segment: Segment): boolean {
   )
 }
 
-// export function intersectSegment2Circle(segment, circle) {
-//   const ips = []
+export function intersectSegment2Circle(
+  segment: Segment,
+  circle: Circle
+): Point[] {
+  const ips: Point[] = []
 
-//   if (segment.box.not_intersect(circle.box)) {
-//     return ips
-//   }
+  if (segment.box.notIntersect(circle.box)) {
+    return ips
+  }
 
-//   // Special case of zero length segment
-//   if (segment.isZeroLength()) {
-//     const [dist, _] = segment.ps.distanceTo(circle.pc)
-//     if (EQ(dist, circle.r)) {
-//       ips.push(segment.ps)
-//     }
-//     return ips
-//   }
+  // Special case of zero length segment
+  if (segment.isZeroLength()) {
+    const [dist] = segment.ps.distanceTo(circle.pc)
+    if (EQ(dist, circle.r)) {
+      ips.push(segment.ps)
+    }
+    return ips
+  }
 
-//   // Non zero-length segment
-//   const line = new Line(segment.ps, segment.pe)
+  // Non zero-length segment
+  const line = new Line(segment.ps, segment.pe)
 
-//   const ips_tmp = intersectLine2Circle(line, circle)
+  const ipsTmp = intersectLine2Circle(line, circle)
 
-//   for (const ip of ips_tmp) {
-//     if (ip.on(segment)) {
-//       ips.push(ip)
-//     }
-//   }
+  for (const ip of ipsTmp) {
+    if (ip.on(segment)) {
+      ips.push(ip)
+    }
+  }
 
-//   return ips
-// }
+  return ips
+}
 
-// export function intersectSegment2Arc(segment, arc) {
-//   const ip = []
+export function intersectSegment2Arc(segment: Segment, arc: Arc): Point[] {
+  const ip: Point[] = []
 
-//   if (segment.box.not_intersect(arc.box)) {
-//     return ip
-//   }
+  if (segment.box.notIntersect(arc.box)) {
+    return ip
+  }
 
-//   // Special case of zero-length segment
-//   if (segment.isZeroLength()) {
-//     if (segment.ps.on(arc)) {
-//       ip.push(segment.ps)
-//     }
-//     return ip
-//   }
+  // Special case of zero-length segment
+  if (segment.isZeroLength()) {
+    if (segment.ps.on(arc)) {
+      ip.push(segment.ps)
+    }
+    return ip
+  }
 
-//   // Non-zero length segment
-//   const line = new Line(segment.ps, segment.pe)
-//   const circle = new Circle(arc.pc, arc.r)
+  // Non-zero length segment
+  const line = new Line(segment.ps, segment.pe)
+  const circle = new Circle(arc.pc, arc.r)
 
-//   const ip_tmp = intersectLine2Circle(line, circle)
+  const ipTmp = intersectLine2Circle(line, circle)
 
-//   for (const pt of ip_tmp) {
-//     if (pt.on(segment) && pt.on(arc)) {
-//       ip.push(pt)
-//     }
-//   }
-//   return ip
-// }
+  for (const pt of ipTmp) {
+    if (pt.on(segment) && pt.on(arc)) {
+      ip.push(pt)
+    }
+  }
+  return ip
+}
 
 // export function intersectSegment2Box(segment, box) {
 //   const ips = []
 //   for (const seg of box.toSegments()) {
-//     const ips_tmp = intersectSegment2Segment(seg, segment)
-//     for (const ip of ips_tmp) {
+//     const ipsTmp = intersectSegment2Segment(seg, segment)
+//     for (const ip of ipsTmp) {
 //       ips.push(ip)
 //     }
 //   }
 //   return ips
 // }
 
-// export function intersectCircle2Circle(circle1, circle2) {
-//   const ip = []
+export function intersectCircle2Circle(
+  circle1: Circle,
+  circle2: Circle
+): Point[] {
+  const ip: Point[] = []
 
-//   if (circle1.box.not_intersect(circle2.box)) {
-//     return ip
-//   }
+  if (circle1.box.notIntersect(circle2.box)) {
+    return ip
+  }
 
-//   const vec = new Vector(circle1.pc, circle2.pc)
+  const vec = new Vector(circle1.pc, circle2.pc)
 
-//   const r1 = circle1.r
-//   const r2 = circle2.r
+  const r1 = circle1.r
+  const r2 = circle2.r
 
-//   // Degenerated circle
-//   if (EQ_0(r1) || EQ_0(r2)) return ip
+  // Degenerated circle
+  if (EQ_0(r1) || EQ_0(r2)) return ip
 
-//   // In case of equal circles return one leftmost point
-//   if (EQ_0(vec.x) && EQ_0(vec.y) && EQ(r1, r2)) {
-//     ip.push(circle1.pc.translate(-r1, 0))
-//     return ip
-//   }
+  // In case of equal circles return one leftmost point
+  if (EQ_0(vec.x) && EQ_0(vec.y) && EQ(r1, r2)) {
+    ip.push(circle1.pc.translate(-r1, 0))
+    return ip
+  }
 
-//   const dist = circle1.pc.distanceTo(circle2.pc)[0]
+  const dist = circle1.pc.distanceTo(circle2.pc)[0]
 
-//   if (GT(dist, r1 + r2))
-//     // circles too far, no intersections
-//     return ip
+  if (GT(dist, r1 + r2))
+    // circles too far, no intersections
+    return ip
 
-//   if (LT(dist, Math.abs(r1 - r2)))
-//     // one circle is contained within another, no intersections
-//     return ip
+  if (LT(dist, Math.abs(r1 - r2)))
+    // one circle is contained within another, no intersections
+    return ip
 
-//   // Normalize vector.
-//   vec.x /= dist
-//   vec.y /= dist
+  // Normalize vector.
+  vec.x /= dist
+  vec.y /= dist
 
-//   let pt
+  let pt
 
-//   // Case of touching from outside or from inside - single intersection point
-//   // TODO: check this specifically not sure if correct
-//   if (EQ(dist, r1 + r2) || EQ(dist, Math.abs(r1 - r2))) {
-//     pt = circle1.pc.translate(r1 * vec.x, r1 * vec.y)
-//     ip.push(pt)
-//     return ip
-//   }
+  // Case of touching from outside or from inside - single intersection point
+  if (EQ(dist, r1 + r2) || EQ(dist, Math.abs(r1 - r2))) {
+    pt = circle1.pc.translate(r1 * vec.x, r1 * vec.y)
+    ip.push(pt)
+    return ip
+  }
 
-//   // Case of two intersection points
+  // Case of two intersection points
 
-//   // Distance from first center to center of common chord:
-//   //   a = (r1^2 - r2^2 + d^2) / 2d
-//   // Separate for better accuracy
-//   const a = (r1 * r1) / (2 * dist) - (r2 * r2) / (2 * dist) + dist / 2
+  // Distance from first center to center of common chord:
+  //   a = (r1^2 - r2^2 + d^2) / 2d
+  // Separate for better accuracy
+  const a = (r1 * r1) / (2 * dist) - (r2 * r2) / (2 * dist) + dist / 2
 
-//   const mid_pt = circle1.pc.translate(a * vec.x, a * vec.y)
-//   const h = Math.sqrt(r1 * r1 - a * a)
-//   // let norm;
+  const midPoint = circle1.pc.translate(a * vec.x, a * vec.y)
+  const h = Math.sqrt(r1 * r1 - a * a)
+  // let norm;
 
-//   // norm = vec.rotate90CCW().multiply(h);
-//   pt = mid_pt.translate(vec.rotate90CCW().multiply(h))
-//   ip.push(pt)
+  // norm = vec.rotate90CCW().multiply(h);
+  pt = midPoint.translate(vec.rotate90CCW().multiply(h))
+  ip.push(pt)
 
-//   // norm = vec.rotate90CW();
-//   pt = mid_pt.translate(vec.rotate90CW().multiply(h))
-//   ip.push(pt)
+  // norm = vec.rotate90CW();
+  pt = midPoint.translate(vec.rotate90CW().multiply(h))
+  ip.push(pt)
 
-//   return ip
-// }
+  return ip
+}
 
 // export function intersectCircle2Box(circle, box) {
 //   const ips = []
 //   for (const seg of box.toSegments()) {
-//     const ips_tmp = intersectSegment2Circle(seg, circle)
-//     for (const ip of ips_tmp) {
+//     const ipsTmp = intersectSegment2Circle(seg, circle)
+//     for (const ip of ipsTmp) {
 //       ips.push(ip)
 //     }
 //   }
 //   return ips
 // }
 
-// export function intersectArc2Arc(arc1, arc2) {
-//   const ip = []
+export function intersectArc2Arc(arc1: Arc, arc2: Arc): Point[] {
+  const ip: Point[] = []
 
-//   if (arc1.box.not_intersect(arc2.box)) {
-//     return ip
-//   }
+  if (arc1.box.notIntersect(arc2.box)) {
+    return ip
+  }
 
-//   // Special case: overlapping arcs
-//   // May return up to 4 intersection points
-//   if (arc1.pc.equalTo(arc2.pc) && EQ(arc1.r, arc2.r)) {
-//     let pt
+  // Special case: overlapping arcs
+  // May return up to 4 intersection points
+  if (arc1.pc.equalTo(arc2.pc) && EQ(arc1.r, arc2.r)) {
+    let pt
 
-//     pt = arc1.start
-//     if (pt.on(arc2)) ip.push(pt)
+    pt = arc1.start
+    if (pt.on(arc2)) ip.push(pt)
 
-//     pt = arc1.end
-//     if (pt.on(arc2)) ip.push(pt)
+    pt = arc1.end
+    if (pt.on(arc2)) ip.push(pt)
 
-//     pt = arc2.start
-//     if (pt.on(arc1)) ip.push(pt)
+    pt = arc2.start
+    if (pt.on(arc1)) ip.push(pt)
 
-//     pt = arc2.end
-//     if (pt.on(arc1)) ip.push(pt)
+    pt = arc2.end
+    if (pt.on(arc1)) ip.push(pt)
 
-//     return ip
-//   }
+    return ip
+  }
 
-//   // Common case
-//   const circle1 = new Circle(arc1.pc, arc1.r)
-//   const circle2 = new Circle(arc2.pc, arc2.r)
-//   const ip_tmp = circle1.intersect(circle2)
-//   for (const pt of ip_tmp) {
-//     if (pt.on(arc1) && pt.on(arc2)) {
-//       ip.push(pt)
-//     }
-//   }
-//   return ip
-// }
+  // Common case
+  const circle1 = new Circle(arc1.pc, arc1.r)
+  const circle2 = new Circle(arc2.pc, arc2.r)
+  const ipTmp = circle1.intersect(circle2)
+  for (const pt of ipTmp) {
+    if (pt.on(arc1) && pt.on(arc2)) {
+      ip.push(pt)
+    }
+  }
+  return ip
+}
 
-// export function intersectArc2Circle(arc, circle) {
-//   const ip = []
+export function intersectArc2Circle(arc: Arc, circle: Circle): Point[] {
+  const ip: Point[] = []
 
-//   if (arc.box.not_intersect(circle.box)) {
-//     return ip
-//   }
+  if (arc.box.notIntersect(circle.box)) {
+    return ip
+  }
 
-//   // Case when arc center incident to circle center
-//   // Return arc's end points as 2 intersection points
-//   if (circle.pc.equalTo(arc.pc) && EQ(circle.r, arc.r)) {
-//     ip.push(arc.start)
-//     ip.push(arc.end)
-//     return ip
-//   }
+  // Case when arc center incident to circle center
+  // Return arc's end points as 2 intersection points
+  if (circle.pc.equalTo(arc.pc) && EQ(circle.r, arc.r)) {
+    ip.push(arc.start)
+    ip.push(arc.end)
+    return ip
+  }
 
-//   // Common case
-//   const circle1 = circle
-//   const circle2 = new Circle(arc.pc, arc.r)
-//   const ip_tmp = intersectCircle2Circle(circle1, circle2)
-//   for (const pt of ip_tmp) {
-//     if (pt.on(arc)) {
-//       ip.push(pt)
-//     }
-//   }
-//   return ip
-// }
+  // Common case
+  const circle1 = circle
+  const circle2 = new Circle(arc.pc, arc.r)
+  const ipTmp = intersectCircle2Circle(circle1, circle2)
+  for (const pt of ipTmp) {
+    if (pt.on(arc)) {
+      ip.push(pt)
+    }
+  }
+  return ip
+}
 
 // export function intersectArc2Box(arc, box) {
 //   const ips = []
 //   for (const seg of box.toSegments()) {
-//     const ips_tmp = intersectSegment2Arc(seg, arc)
-//     for (const ip of ips_tmp) {
+//     const ipsTmp = intersectSegment2Arc(seg, arc)
+//     for (const ip of ipsTmp) {
 //       ips.push(ip)
 //     }
 //   }
@@ -592,9 +600,9 @@ function isPointInSegmentBox(point: Point, segment: Segment): boolean {
 //   }
 // }
 
-// function ptInIntPoints(new_pt, ip) {
-//   return ip.some((pt) => pt.equalTo(new_pt))
-// }
+function ptInIntPoints(newPt: Point, ip: Point[]): boolean {
+  return ip.some((pt) => pt.equalTo(newPt))
+}
 
 // function createLineFromRay(ray) {
 //   return new Line(ray.start, ray.norm)

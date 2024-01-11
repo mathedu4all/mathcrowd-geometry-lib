@@ -8,6 +8,8 @@ import { Matrix } from './matrix'
 import { Line } from './line'
 import { EQ_0 } from '../utils/utils'
 import { Errors } from '../utils/errors'
+import { Circle } from './circle'
+import { Arc } from './arc'
 
 /**
  * Class representing a segment
@@ -34,10 +36,6 @@ export class Segment extends Shape<Segment> {
       | []
   ) {
     super()
-
-    this.ps = new Point()
-
-    this.pe = new Point()
 
     if (args.length === 0) {
       return
@@ -174,17 +172,17 @@ export class Segment extends Shape<Segment> {
       return Intersection.intersectSegment2Segment(this, shape)
     }
 
-    // if (shape instanceof Circle) {
-    //   return Intersection.intersectSegment2Circle(this, shape)
-    // }
+    if (shape instanceof Circle) {
+      return Intersection.intersectSegment2Circle(this, shape)
+    }
 
     // if (shape instanceof Box) {
     //   return Intersection.intersectSegment2Box(this, shape)
     // }
 
-    // if (shape instanceof Arc) {
-    //   return Intersection.intersectSegment2Arc(this, shape)
-    // }
+    if (shape instanceof Arc) {
+      return Intersection.intersectSegment2Arc(this, shape)
+    }
 
     // if (shape instanceof Polygon) {
     //   return Intersection.intersectSegment2Polygon(this, shape)
@@ -204,10 +202,10 @@ export class Segment extends Shape<Segment> {
       const [dist, shortestSegment] = Distance.point2segment(shape, this)
       return [dist, shortestSegment.reverse()]
     }
-    // if (shape instanceof Circle) {
-    //   const [dist, shortest_segment] = Distance.segment2circle(this, shape)
-    //   return [dist, shortest_segment]
-    // }
+    if (shape instanceof Circle) {
+      const [dist, shortestSegment] = Distance.segment2circle(this, shape)
+      return [dist, shortestSegment]
+    }
     if (shape instanceof Line) {
       const [dist, shortestSegment] = Distance.segment2line(this, shape)
       return [dist, shortestSegment]
@@ -216,17 +214,17 @@ export class Segment extends Shape<Segment> {
       const [dist, shortestSegment] = Distance.segment2segment(this, shape)
       return [dist, shortestSegment]
     }
-    // if (shape instanceof Arc) {
-    //   const [dist, shortest_segment] = Distance.segment2arc(this, shape)
-    //   return [dist, shortest_segment]
-    // }
+    if (shape instanceof Arc) {
+      const [dist, shortestSegment] = Distance.segment2arc(this, shape)
+      return [dist, shortestSegment]
+    }
     // if (shape instanceof Polygon) {
-    //   const [dist, shortest_segment] = Distance.shape2polygon(this, shape)
-    //   return [dist, shortest_segment]
+    //   const [dist, shortestSegment] = Distance.shape2polygon(this, shape)
+    //   return [dist, shortestSegment]
     // }
     // if (shape instanceof PlanarSet) {
-    //   const [dist, shortest_segment] = Distance.shape2planarSet(this, shape)
-    //   return [dist, shortest_segment]
+    //   const [dist, shortestSegment] = Distance.shape2planarSet(this, shape)
+    //   return [dist, shortestSegment]
     // }
     throw Errors.OPERATION_IS_NOT_SUPPORTED
   }

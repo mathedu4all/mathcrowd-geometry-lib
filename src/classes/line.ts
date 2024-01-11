@@ -8,6 +8,7 @@ import { EQ_0 } from '../utils/utils'
 import { Errors } from '../utils/errors'
 import { Distance } from '../algorithms/distance'
 import { Segment } from './segment'
+import { Circle } from './circle'
 /**
  * Class representing a line
  * @type {Line}
@@ -15,14 +16,12 @@ import { Segment } from './segment'
 export class Line extends Shape<Line> {
   /**
    * Point a line passes through
-   * @type {Point}
    */
   pt: Point = new Point()
   /**
    * Normal vector to a line <br/>
    * Vector is normalized (length == 1)<br/>
    * Direction of the vector is chosen to satisfy inequality norm * p >= 0
-   * @type {Vector}
    */
   norm: Vector = new Vector(0, 1)
 
@@ -33,10 +32,6 @@ export class Line extends Shape<Line> {
     ...args: [Point, Vector] | [Point, Point] | [Vector, Point] | []
   ) {
     super()
-
-    this.pt = new Point()
-
-    this.norm = new Vector(0, 1)
 
     if (args.length === 0) {
       return
@@ -222,9 +217,9 @@ export class Line extends Shape<Line> {
     //   return Intersection.intersectRay2Line(shape, this)
     // }
 
-    // if (shape instanceof Circle) {
-    //   return Intersection.intersectLine2Circle(this, shape)
-    // }
+    if (shape instanceof Circle) {
+      return Intersection.intersectLine2Circle(this, shape)
+    }
 
     // if (shape instanceof Box) {
     //   return Intersection.intersectLine2Box(this, shape)

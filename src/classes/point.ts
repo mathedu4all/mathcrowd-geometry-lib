@@ -8,6 +8,8 @@ import { Vector } from './vector'
 import { Segment } from './segment'
 import { Errors } from '../utils/errors'
 import { Distance } from '../algorithms/distance'
+import { Arc } from './arc'
+import { Circle } from './circle'
 
 // import { Vector } from './vector'
 
@@ -35,9 +37,6 @@ export class Point extends Shape<Point> implements SimplePoint {
    */
   constructor(...args: [[number, number]] | [number, number] | []) {
     super()
-
-    this.x = 0
-    this.y = 0
 
     // return zero point
     if (args.length === 0) {
@@ -166,17 +165,17 @@ export class Point extends Shape<Point> implements SimplePoint {
       return Distance.point2line(this, shape)
     }
 
-    //     if (shape instanceof Flatten.Circle) {
-    //       return Flatten.Distance.point2circle(this, shape)
-    //     }
+    if (shape instanceof Circle) {
+      return Distance.point2circle(this, shape)
+    }
 
     if (shape instanceof Segment) {
       return Distance.point2segment(this, shape)
     }
 
-    //     if (shape instanceof Flatten.Arc) {
-    //       return Flatten.Distance.point2arc(this, shape)
-    //     }
+    if (shape instanceof Arc) {
+      return Distance.point2arc(this, shape)
+    }
 
     //     if (shape instanceof Flatten.Polygon) {
     //       return Flatten.Distance.point2polygon(this, shape)
@@ -220,9 +219,9 @@ export class Point extends Shape<Point> implements SimplePoint {
       return shape.contains(this)
     }
 
-    // if (shape instanceof Flatten.Arc) {
-    //   return shape.contains(this)
-    // }
+    if (shape instanceof Arc) {
+      return shape.contains(this)
+    }
 
     // if (shape instanceof Flatten.Polygon) {
     //   return shape.contains(this)

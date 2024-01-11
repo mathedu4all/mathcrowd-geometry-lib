@@ -7,7 +7,8 @@ import {
   point,
   vector,
   line,
-  segment
+  segment,
+  Circle
 } from '../index'
 import { EQ } from '../utils/utils'
 
@@ -128,12 +129,12 @@ describe('Segment.Intersect', function () {
     expect(segment1.box.intersect(segment2.box)).toBe(true)
     expect(segment1.intersect(segment2).length).toBe(0)
   })
-  // it('Intersection with Segment - boxes not intersecting, quick reject', function () {
-  //   const segment1 = new Segment(new Point(0, 0), new Point(2, 2))
-  //   const segment2 = new Segment(new Point(-0.5, 2.5), new Point(-2, -4))
-  //   expect(segment1.box.not_intersect(segment2.box)).toBe(true)
-  //   expect(segment1.intersect(segment2).length).toBe(0)
-  // })
+  it('Intersection with Segment - boxes not intersecting, quick reject', function () {
+    const segment1 = new Segment(new Point(0, 0), new Point(2, 2))
+    const segment2 = new Segment(new Point(-0.5, 2.5), new Point(-2, -4))
+    expect(segment1.box.notIntersect(segment2.box)).toBe(true)
+    expect(segment1.intersect(segment2).length).toBe(0)
+  })
   it('Intersection with Line - not parallel segments case (one point)', function () {
     const segment = new Segment(new Point(0, 0), new Point(2, 2))
     const line = new Line(new Point(0, 2), new Point(2, 0))
@@ -147,20 +148,20 @@ describe('Segment.Intersect', function () {
     expect(segment.intersect(line)[0]).toEqual({ x: 0, y: 0 })
     expect(segment.intersect(line)[1]).toEqual({ x: 2, y: 2 })
   })
-  // it('Intersection with Circle', function () {
-  //   const segment = new Segment(0, 0, 2, 2)
-  //   const circle = new Circle(new Point(0, 0), 1)
-  //   const ip_expected = new Point(Math.sqrt(2) / 2, Math.sqrt(2) / 2)
-  //   expect(segment.intersect(circle).length).toBe(1)
-  //   expect(segment.intersect(circle)[0].equalTo(ip_expected)).toBe(true)
-  // })
-  // it('Intersection with Circle - case of tangent', function () {
-  //   const segment = new Segment(-2, 2, 2, 2)
-  //   const circle = new Circle(new Point(0, 0), 2)
-  //   const ip_expected = new Point(0, 2)
-  //   expect(segment.intersect(circle).length).toBe(1)
-  //   expect(segment.intersect(circle)[0].equalTo(ip_expected)).toBe(true)
-  // })
+  it('Intersection with Circle', function () {
+    const segment = new Segment(0, 0, 2, 2)
+    const circle = new Circle(new Point(0, 0), 1)
+    const ipExpected = new Point(Math.sqrt(2) / 2, Math.sqrt(2) / 2)
+    expect(segment.intersect(circle).length).toBe(1)
+    expect(segment.intersect(circle)[0].equalTo(ipExpected)).toBe(true)
+  })
+  it('Intersection with Circle - case of tangent', function () {
+    const segment = new Segment(-2, 2, 2, 2)
+    const circle = new Circle(new Point(0, 0), 2)
+    const ipExpected = new Point(0, 2)
+    expect(segment.intersect(circle).length).toBe(1)
+    expect(segment.intersect(circle)[0].equalTo(ipExpected)).toBe(true)
+  })
   // it('Intersection with Polygon', function () {
   //   const segment = new Segment(150, -20, 150, 60)
 
@@ -207,6 +208,7 @@ describe('Segment.Intersect', function () {
     expect(ip.length).toBe(0)
   })
 })
+
 describe('Segment.DistanceTo', function () {
   it('Distance to Segment Case 1 Intersected Segments', function () {
     const segment1 = new Segment(new Point(0, 0), new Point(2, 2))
@@ -224,54 +226,53 @@ describe('Segment.DistanceTo', function () {
     const l = line(point(-1, 1), vector(0, -1))
     expect(seg.distanceTo(l)[0]).toBe(2)
   })
-  //   it('Distance to Circle Case 1 Intersection - touching', function () {
-  //     const segment = new Segment(point(-4, 2), point(4, 2))
-  //     const circle = new Circle(point(0, 0), 2)
-  //     expect(segment.distanceTo(circle)[0]).toBe(0)
-  //   })
-  //   it('Distance to Circle Case 1 Intersection - two points', function () {
-  //     const segment = new Segment(point(-4, 2), point(4, 2))
-  //     const circle = new Circle(point(0, 0), 3)
-  //     expect(segment.distanceTo(circle)[0]).toBe(0)
-  //   })
-  //   it('Distance to Circle Case 1 Intersection - one points', function () {
-  //     const segment = new Segment(point(0, 2), point(4, 2))
-  //     const circle = new Circle(point(0, 0), 3)
-  //     expect(segment.distanceTo(circle)[0]).toBe(0)
-  //   })
-  //   it('Distance to Circle Case 2 Projection', function () {
-  //     const segment = new Segment(point(-4, 4), point(4, 4))
-  //     const circle = new Circle(point(0, 0), 2)
-  //     expect(segment.distanceTo(circle)[0]).toBe(2)
-  //   })
-  //   it('Distance to Circle Case 3 End point out of the circle', function () {
-  //     const segment = new Segment(point(2, 2), point(4, 2))
-  //     const circle = new Circle(point(0, 0), 2)
-  //     expect(segment.distanceTo(circle)[0]).toBe(2 * Math.sqrt(2) - 2)
-  //   })
-  //   it('Distance to Circle Case 3 End point inside the circle', function () {
-  //     const segment = new Segment(point(-1, 1), point(1, 1))
-  //     const circle = new Circle(point(0, 0), 2)
-  //     expect(segment.distanceTo(circle)[0]).toBe(2 - Math.sqrt(2))
-  //   })
-  // })
+  it('Distance to Circle Case 1 Intersection - touching', function () {
+    const segment = new Segment(point(-4, 2), point(4, 2))
+    const circle = new Circle(point(0, 0), 2)
+    expect(segment.distanceTo(circle)[0]).toBe(0)
+  })
+  it('Distance to Circle Case 1 Intersection - two points', function () {
+    const segment = new Segment(point(-4, 2), point(4, 2))
+    const circle = new Circle(point(0, 0), 3)
+    expect(segment.distanceTo(circle)[0]).toBe(0)
+  })
+  it('Distance to Circle Case 1 Intersection - one points', function () {
+    const segment = new Segment(point(0, 2), point(4, 2))
+    const circle = new Circle(point(0, 0), 3)
+    expect(segment.distanceTo(circle)[0]).toBe(0)
+  })
+  it('Distance to Circle Case 2 Projection', function () {
+    const segment = new Segment(point(-4, 4), point(4, 4))
+    const circle = new Circle(point(0, 0), 2)
+    expect(segment.distanceTo(circle)[0]).toBe(2)
+  })
+  it('Distance to Circle Case 3 End point out of the circle', function () {
+    const segment = new Segment(point(2, 2), point(4, 2))
+    const circle = new Circle(point(0, 0), 2)
+    expect(segment.distanceTo(circle)[0]).toBe(2 * Math.sqrt(2) - 2)
+  })
+  it('Distance to Circle Case 3 End point inside the circle', function () {
+    const segment = new Segment(point(-1, 1), point(1, 1))
+    const circle = new Circle(point(0, 0), 2)
+    expect(segment.distanceTo(circle)[0]).toBe(2 - Math.sqrt(2))
+  })
+})
 
-  describe('#Segment.pointAtLength', function () {
-    it('gets the point at specific length', function () {
-      const segment = new Segment(point(-1, 1), point(1, 1))
-      expect(segment.length).toBe(2)
-      expect(segment.pointAtLength(1).x).toBe(0)
-      expect(segment.pointAtLength(0).x).toBe(-1)
-      expect(segment.pointAtLength(2).x).toBe(1)
-      expect(segment.pointAtLength(0.5).x).toBe(-0.5)
-    })
-    it('points at specific length is on segment', function () {
-      const segment = new Segment(point(-12, 4), point(30, -2))
-      const length = segment.length
-      for (let i = 0; i < 33; i++) {
-        const point = segment.pointAtLength((i / 33) * length)
-        expect(segment.contains(point)).toBe(true)
-      }
-    })
+describe('#Segment.pointAtLength', function () {
+  it('gets the point at specific length', function () {
+    const segment = new Segment(point(-1, 1), point(1, 1))
+    expect(segment.length).toBe(2)
+    expect(segment.pointAtLength(1).x).toBe(0)
+    expect(segment.pointAtLength(0).x).toBe(-1)
+    expect(segment.pointAtLength(2).x).toBe(1)
+    expect(segment.pointAtLength(0.5).x).toBe(-0.5)
+  })
+  it('points at specific length is on segment', function () {
+    const segment = new Segment(point(-12, 4), point(30, -2))
+    const length = segment.length
+    for (let i = 0; i < 33; i++) {
+      const point = segment.pointAtLength((i / 33) * length)
+      expect(segment.contains(point)).toBe(true)
+    }
   })
 })

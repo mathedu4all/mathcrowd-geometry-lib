@@ -7,8 +7,11 @@ import {
   // Polygon,
   line,
   point,
-  vector
+  vector,
+  Circle,
+  Arc
 } from '../index'
+import { CCW } from '../utils/constants'
 
 describe('Line', function () {
   it('May create new instance of Line', function () {
@@ -94,37 +97,38 @@ describe('#Line.intersect methods return array of intersection points if interse
     const ip = line1.intersect(line2)
     expect(ip.length).toBe(0)
   })
-  // it('Line to circle intersection - horizontal line, line constricted with 2 points', function () {
-  //   const line = new Line(new Point(-1, 1), new Point(1, 1))
-  //   const circle = new Circle(new Point(0, 0), 3)
-  //   const ip = line.intersect(circle)
-  //   expect(ip.length).toBe(2)
-  //   expect(ip[0].y).toBe(1)
-  //   expect(ip[1].y).toBe(1)
-  // })
-  // it('Line to circle intersection - horizontal line, line constructed with point and vector', function () {
-  //   const line = new Line(new Point(-1, 1), new Vector(0, 3))
-  //   const circle = new Circle(new Point(0, 0), 3)
-  //   const ip = line.intersect(circle)
-  //   expect(ip.length).toBe(2)
-  //   expect(ip[0].y).toBe(1)
-  //   expect(ip[1].y).toBe(1)
-  // })
-  // it('Line to circle intersection - diagonal line, line constructed with point and vector', function () {
-  //   const line = new Line(new Point(-3, -3), new Vector(-1, 1))
-  //   const circle = new Circle(new Point(0, 0), 1)
-  //   const ip = line.intersect(circle)
-  //   const sqrt_2_2 = Math.sqrt(2) / 2
-  //   expect(ip.length).toBe(2)
-  //   expect(ip[0].equalTo(point(-sqrt_2_2, -sqrt_2_2))).to.be.true
-  //   expect(ip[1].equalTo(point(sqrt_2_2, sqrt_2_2))).to.be.true
-  // })
-  // it('Line to arc intersection - quick reject', function () {
-  //   const line = new Line(point(1, 0), vector(1, 0))
-  //   const arc = new Arc(point(1, 0), 3, -Math.PI / 3, Math.PI / 3, CCW)
-  //   const ip = line.intersect(arc)
-  //   expect(ip.length).toBe(0)
-  // })
+  it('Line to circle intersection - horizontal line, line constricted with 2 points', function () {
+    const line = new Line(new Point(-1, 1), new Point(1, 1))
+    const circle = new Circle(new Point(0, 0), 3)
+    const ip = line.intersect(circle)
+    expect(ip.length).toBe(2)
+    expect(ip[0].y).toBe(1)
+    expect(ip[1].y).toBe(1)
+  })
+  it('Line to circle intersection - horizontal line, line constructed with point and vector', function () {
+    const line = new Line(new Point(-1, 1), new Vector(0, 3))
+    const circle = new Circle(new Point(0, 0), 3)
+    const ip = line.intersect(circle)
+    expect(ip.length).toBe(2)
+    expect(ip[0].y).toBe(1)
+    expect(ip[1].y).toBe(1)
+  })
+  it('Line to circle intersection - diagonal line, line constructed with point and vector', function () {
+    const line = new Line(new Point(-3, -3), new Vector(-1, 1))
+    const circle = new Circle(new Point(0, 0), 1)
+    const ip = line.intersect(circle)
+    expect(ip.length).toBe(2)
+    expect(ip[0].equalTo(point(-Math.sqrt(2) / 2, -Math.sqrt(2) / 2))).toBe(
+      true
+    )
+    expect(ip[1].equalTo(point(Math.sqrt(2) / 2, Math.sqrt(2) / 2))).toBe(true)
+  })
+  it('Line to arc intersection - quick reject', function () {
+    const line = new Line(point(1, 0), vector(1, 0))
+    const arc = new Arc(point(1, 0), 3, -Math.PI / 3, Math.PI / 3, CCW)
+    const ip = line.intersect(arc)
+    expect(ip.length).toBe(0)
+  })
   // it('Line to polygon intersection', function () {
   //   'use strict'
 

@@ -32,9 +32,6 @@ export class Vector extends Shape<Vector> implements SimplePoint {
   ) {
     super()
 
-    this.x = 0
-    this.y = 0
-
     // return zero vector
     if (args.length === 0) {
       return

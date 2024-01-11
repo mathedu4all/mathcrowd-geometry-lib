@@ -2,6 +2,7 @@ import { Shape } from './shape'
 import { Errors } from '../utils/errors'
 import { Matrix } from './matrix'
 import { Point } from './point'
+import { Segment } from './segment'
 
 /**
  * Class Box represents bounding box of the shape.
@@ -11,37 +12,33 @@ import { Point } from './point'
 export class Box extends Shape<Box> {
   /**
    * Minimal x coordinate
-   * @type {number}
    */
   xmin: number
   /**
    * Minimal y coordinate
-   * @type {number}
    */
   ymin: number
   /**
    * Maximal x coordinate
-   * @type {number}
    */
   xmax: number
   /**
    * Maximal y coordinate
-   * @type {number}
    */
   ymax: number
 
   /**
    *
-   * @param {number} xmin - minimal x coordinate
-   * @param {number} ymin - minimal y coordinate
-   * @param {number} xmax - maximal x coordinate
-   * @param {number} ymax - maximal y coordinate
+   * @param xmin - minimal x coordinate
+   * @param ymin - minimal y coordinate
+   * @param xmax - maximal x coordinate
+   * @param ymax - maximal y coordinate
    */
   constructor(
     xmin: number = Number.POSITIVE_INFINITY,
     ymin: number = Number.POSITIVE_INFINITY,
-    xmax: number = Number.POSITIVE_INFINITY,
-    ymax: number = Number.POSITIVE_INFINITY
+    xmax: number = Number.NEGATIVE_INFINITY,
+    ymax: number = Number.NEGATIVE_INFINITY
   ) {
     super()
 
@@ -191,8 +188,8 @@ export class Box extends Shape<Box> {
   set(
     xmin: number = Number.POSITIVE_INFINITY,
     ymin: number = Number.POSITIVE_INFINITY,
-    xmax: number = Number.POSITIVE_INFINITY,
-    ymax: number = Number.POSITIVE_INFINITY
+    xmax: number = Number.NEGATIVE_INFINITY,
+    ymax: number = Number.NEGATIVE_INFINITY
   ) {
     this.xmin = xmin
     this.ymin = ymin
@@ -213,19 +210,19 @@ export class Box extends Shape<Box> {
     ]
   }
 
-  // /**
-  //  * Transform box into array of segments from low left corner in counterclockwise
-  //  * @returns {Segment[]}
-  //  */
-  // toSegments() {
-  //   const pts = this.toPoints()
-  //   return [
-  //     new Flatten.Segment(pts[0], pts[1]),
-  //     new Flatten.Segment(pts[1], pts[2]),
-  //     new Flatten.Segment(pts[2], pts[3]),
-  //     new Flatten.Segment(pts[3], pts[0])
-  //   ]
-  // }
+  /**
+   * Transform box into array of segments from low left corner in counterclockwise
+   * @returns
+   */
+  toSegments(): Segment[] {
+    const pts = this.toPoints()
+    return [
+      new Segment(pts[0], pts[1]),
+      new Segment(pts[1], pts[2]),
+      new Segment(pts[2], pts[3]),
+      new Segment(pts[3], pts[0])
+    ]
+  }
 
   /**
    * Box rotation is not supported
@@ -315,6 +312,6 @@ export class Box extends Shape<Box> {
 export const box = (
   xmin: number = Number.POSITIVE_INFINITY,
   ymin: number = Number.POSITIVE_INFINITY,
-  xmax: number = Number.POSITIVE_INFINITY,
-  ymax: number = Number.POSITIVE_INFINITY
+  xmax: number = Number.NEGATIVE_INFINITY,
+  ymax: number = Number.NEGATIVE_INFINITY
 ) => new Box(xmin, ymin, xmax, ymax)

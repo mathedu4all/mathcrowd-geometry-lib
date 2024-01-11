@@ -4,6 +4,8 @@ import { Segment } from '../classes/segment'
 import { Vector } from '../classes/vector'
 import { EQ_0, GE, GT, LT } from '../utils/utils'
 import * as Intersection from '../algorithms/intersection'
+import { Circle } from '../classes/circle'
+import { Arc } from '../classes/arc'
 
 export class Distance {
   /**
@@ -28,23 +30,23 @@ export class Distance {
     return [vec.length, new Segment(pt, closestPoint)]
   }
 
-  // /**
-  //  * Calculate distance and shortest segment between point and circle
-  //  * @param pt
-  //  * @param circle
-  //  * @returns {Number | Segment} - distance and shortest segment
-  //  */
-  // static point2circle(pt, circle) {
-  //   const [dist2center, shortest_dist] = pt.distanceTo(circle.center)
-  //   if (EQ_0(dist2center)) {
-  //     return [circle.r, new Segment(pt, circle.toArc().start)]
-  //   } else {
-  //     const dist = Math.abs(dist2center - circle.r)
-  //     const v = new Vector(circle.pc, pt).normalize().multiply(circle.r)
-  //     const closest_point = circle.pc.translate(v)
-  //     return [dist, new Segment(pt, closest_point)]
-  //   }
-  // }
+  /**
+   * Calculate distance and shortest segment between point and circle
+   * @param pt
+   * @param circle
+   * @returns  distance and shortest segment
+   */
+  static point2circle(pt: Point, circle: Circle): [number, Segment] {
+    const [dist2center] = pt.distanceTo(circle.center)
+    if (EQ_0(dist2center)) {
+      return [circle.r, new Segment(pt, circle.toArc().start)]
+    } else {
+      const dist = Math.abs(dist2center - circle.r)
+      const v = new Vector(circle.pc, pt).normalize().multiply(circle.r)
+      const closestPoint = circle.pc.translate(v)
+      return [dist, new Segment(pt, closestPoint)]
+    }
+  }
 
   /**
    * Calculate distance and shortest segment between point and segment
@@ -78,27 +80,26 @@ export class Distance {
     }
   }
 
-  // /**
-  //  * Calculate distance and shortest segment between point and arc
-  //  * @param pt
-  //  * @param arc
-  //  * @returns {Number | Segment} - distance and shortest segment
-  //  */
-  // static point2arc(pt, arc) {
-  //   const circle = new Circle(arc.pc, arc.r)
-  //   const dist_and_segment = []
-  //   let dist, shortest_segment
-  //   ;[dist, shortest_segment] = Distance.point2circle(pt, circle)
-  //   if (shortest_segment.end.on(arc)) {
-  //     dist_and_segment.push(Distance.point2circle(pt, circle))
-  //   }
-  //   dist_and_segment.push(Distance.point2point(pt, arc.start))
-  //   dist_and_segment.push(Distance.point2point(pt, arc.end))
+  /**
+   * Calculate distance and shortest segment between point and arc
+   * @param pt
+   * @param arc
+   * @returns {Number | Segment} - distance and shortest segment
+   */
+  static point2arc(pt: Point, arc: Arc): [number, Segment] {
+    const circle = new Circle(arc.pc, arc.r)
+    const distanceAndSegment = []
+    const [_, shortestSegment] = Distance.point2circle(pt, circle)
+    if (shortestSegment.end.on(arc)) {
+      distanceAndSegment.push(Distance.point2circle(pt, circle))
+    }
+    distanceAndSegment.push(Distance.point2point(pt, arc.start))
+    distanceAndSegment.push(Distance.point2point(pt, arc.end))
 
-  //   Distance.sort(dist_and_segment)
+    Distance.sort(distanceAndSegment)
 
-  //   return dist_and_segment[0]
-  // }
+    return distanceAndSegment[0]
+  }
 
   /**
    * Calculate distance and shortest segment between segment and line
@@ -150,146 +151,146 @@ export class Distance {
     return distanceAndSegment[0]
   }
 
-  //   /**
-  //    * Calculate distance and shortest segment between segment and circle
-  //    * @param seg
-  //    * @param circle
-  //    * @returns {Number | Segment} - distance and shortest segment
-  //    */
-  //   static segment2circle(seg, circle) {
-  //     /* Case 1 Segment and circle intersected. Return the first point and zero distance */
-  //     const ip = seg.intersect(circle)
-  //     if (ip.length > 0) {
-  //       return [0, new Segment(ip[0], ip[0])]
-  //     }
+  /**
+   * Calculate distance and shortest segment between segment and circle
+   * @param seg
+   * @param circle
+   * @returns distance and shortest segment
+   */
+  static segment2circle(seg: Segment, circle: Circle): [number, Segment] {
+    /* Case 1 Segment and circle intersected. Return the first point and zero distance */
+    const ip = seg.intersect(circle)
+    if (ip.length > 0) {
+      return [0, new Segment(ip[0], ip[0])]
+    }
 
-  //     // No intersection between segment and circle
+    // No intersection between segment and circle
 
-  //     /* Case 2. Distance to projection of center point to line bigger than radius
-  //      * And projection point belong to segment
-  //      * Then measure again distance from projection to circle and return it */
-  //     const line = new Line(seg.ps, seg.pe)
-  //     const [dist, shortest_segment] = Distance.point2line(circle.center, line)
-  //     if (GE(dist, circle.r) && shortest_segment.end.on(seg)) {
-  //       return Distance.point2circle(shortest_segment.end, circle)
-  //     } else {
-  //       /* Case 3. Otherwise closest point is one of the end points of the segment */
-  //       const [dist_from_start, shortest_segment_from_start] =
-  //         Distance.point2circle(seg.start, circle)
-  //       const [dist_from_end, shortest_segment_from_end] = Distance.point2circle(
-  //         seg.end,
-  //         circle
-  //       )
-  //       return LT(dist_from_start, dist_from_end)
-  //         ? [dist_from_start, shortest_segment_from_start]
-  //         : [dist_from_end, shortest_segment_from_end]
-  //     }
-  //   }
+    /* Case 2. Distance to projection of center point to line bigger than radius
+     * And projection point belong to segment
+     * Then measure again distance from projection to circle and return it */
+    const line = new Line(seg.ps, seg.pe)
+    const [dist, shortestSegment] = Distance.point2line(circle.center, line)
+    if (GE(dist, circle.r) && shortestSegment.end.on(seg)) {
+      return Distance.point2circle(shortestSegment.end, circle)
+    } else {
+      /* Case 3. Otherwise closest point is one of the end points of the segment */
+      const [distFromStart, shortestSegmentFromStart] = Distance.point2circle(
+        seg.start,
+        circle
+      )
+      const [distFromEnd, shortestSegmentFromEnd] = Distance.point2circle(
+        seg.end,
+        circle
+      )
+      return LT(distFromStart, distFromEnd)
+        ? [distFromStart, shortestSegmentFromStart]
+        : [distFromEnd, shortestSegmentFromEnd]
+    }
+  }
 
-  //   /**
-  //    * Calculate distance and shortest segment between segment and arc
-  //    * @param seg
-  //    * @param arc
-  //    * @returns {Number | Segment} - distance and shortest segment
-  //    */
-  //   static segment2arc(seg, arc) {
-  //     /* Case 1 Segment and arc intersected. Return the first point and zero distance */
-  //     const ip = seg.intersect(arc)
-  //     if (ip.length > 0) {
-  //       return [0, new Segment(ip[0], ip[0])]
-  //     }
+  /**
+   * Calculate distance and shortest segment between segment and arc
+   * @param seg
+   * @param arc
+   * @returns distance and shortest segment
+   */
+  static segment2arc(seg: Segment, arc: Arc): [number, Segment] {
+    /* Case 1 Segment and arc intersected. Return the first point and zero distance */
+    const ip = seg.intersect(arc)
+    if (ip.length > 0) {
+      return [0, new Segment(ip[0], ip[0])]
+    }
 
-  //     // No intersection between segment and arc
-  //     const line = new Line(seg.ps, seg.pe)
-  //     const circle = new Circle(arc.pc, arc.r)
+    // No intersection between segment and arc
+    const line = new Line(seg.ps, seg.pe)
+    const circle = new Circle(arc.pc, arc.r)
 
-  //     /* Case 2. Distance to projection of center point to line bigger than radius AND
-  //      * projection point belongs to segment AND
-  //      * distance from projection point to circle belongs to arc  =>
-  //      * return this distance from projection to circle */
-  //     const [dist_from_center, shortest_segment_from_center] =
-  //       Distance.point2line(circle.center, line)
-  //     if (
-  //       GE(dist_from_center, circle.r) &&
-  //       shortest_segment_from_center.end.on(seg)
-  //     ) {
-  //       const [dist_from_projection, shortest_segment_from_projection] =
-  //         Distance.point2circle(shortest_segment_from_center.end, circle)
-  //       if (shortest_segment_from_projection.end.on(arc)) {
-  //         return [dist_from_projection, shortest_segment_from_projection]
-  //       }
-  //     }
-  //     /* Case 3. Otherwise closest point is one of the end points of the segment */
-  //     const dist_and_segment = []
-  //     dist_and_segment.push(Distance.point2arc(seg.start, arc))
-  //     dist_and_segment.push(Distance.point2arc(seg.end, arc))
+    /* Case 2. Distance to projection of center point to line bigger than radius AND
+     * projection point belongs to segment AND
+     * distance from projection point to circle belongs to arc  =>
+     * return this distance from projection to circle */
+    const [distFromCenter, shortestSegmentFromCenter] = Distance.point2line(
+      circle.center,
+      line
+    )
+    if (GE(distFromCenter, circle.r) && shortestSegmentFromCenter.end.on(seg)) {
+      const [distFromProjection, shortestSegmentFromProjection] =
+        Distance.point2circle(shortestSegmentFromCenter.end, circle)
+      if (shortestSegmentFromProjection.end.on(arc)) {
+        return [distFromProjection, shortestSegmentFromProjection]
+      }
+    }
+    /* Case 3. Otherwise closest point is one of the end points of the segment */
+    const distanceAndSegment: [number, Segment][] = []
+    distanceAndSegment.push(Distance.point2arc(seg.start, arc))
+    distanceAndSegment.push(Distance.point2arc(seg.end, arc))
 
-  //     let dist_tmp, segment_tmp
-  //     ;[dist_tmp, segment_tmp] = Distance.point2segment(arc.start, seg)
-  //     dist_and_segment.push([dist_tmp, segment_tmp.reverse()])
-  //     ;[dist_tmp, segment_tmp] = Distance.point2segment(arc.end, seg)
-  //     dist_and_segment.push([dist_tmp, segment_tmp.reverse()])
+    const [distTmp1, segmentTmp1] = Distance.point2segment(arc.start, seg)
+    distanceAndSegment.push([distTmp1, segmentTmp1.reverse()])
+    const [distTmp2, segmentTmp2] = Distance.point2segment(arc.end, seg)
+    distanceAndSegment.push([distTmp2, segmentTmp2.reverse()])
 
-  //     Distance.sort(dist_and_segment)
-  //     return dist_and_segment[0]
-  //   }
+    Distance.sort(distanceAndSegment)
+    return distanceAndSegment[0]
+  }
 
-  //   /**
-  //    * Calculate distance and shortest segment between two circles
-  //    * @param circle1
-  //    * @param circle2
-  //    * @returns {Number | Segment} - distance and shortest segment
-  //    */
-  //   static circle2circle(circle1, circle2) {
-  //     const ip = circle1.intersect(circle2)
-  //     if (ip.length > 0) {
-  //       return [0, new Segment(ip[0], ip[0])]
-  //     }
+  /**
+   * Calculate distance and shortest segment between two circles
+   * @param circle1
+   * @param circle2
+   * @returns distance and shortest segment
+   */
+  static circle2circle(circle1: Circle, circle2: Circle): [number, Segment] {
+    const ip = circle1.intersect(circle2)
+    if (ip.length > 0) {
+      return [0, new Segment(ip[0], ip[0])]
+    }
 
-  //     // Case 1. Concentric circles. Convert to arcs and take distance between two arc starts
-  //     if (circle1.center.equalTo(circle2.center)) {
-  //       const arc1 = circle1.toArc()
-  //       const arc2 = circle2.toArc()
-  //       return Distance.point2point(arc1.start, arc2.start)
-  //     } else {
-  //       // Case 2. Not concentric circles
-  //       const line = new Line(circle1.center, circle2.center)
-  //       const ip1 = line.intersect(circle1)
-  //       const ip2 = line.intersect(circle2)
+    // Case 1. Concentric circles. Convert to arcs and take distance between two arc starts
+    if (circle1.center.equalTo(circle2.center)) {
+      const arc1 = circle1.toArc()
+      const arc2 = circle2.toArc()
+      return Distance.point2point(arc1.start, arc2.start)
+    } else {
+      // Case 2. Not concentric circles
+      const line = new Line(circle1.center, circle2.center)
+      const ip1 = line.intersect(circle1)
+      const ip2 = line.intersect(circle2)
+      const distanceAndSegment = []
 
-  //       const dist_and_segment = []
+      distanceAndSegment.push(Distance.point2point(ip1[0], ip2[0]))
+      distanceAndSegment.push(Distance.point2point(ip1[0], ip2[1]))
+      distanceAndSegment.push(Distance.point2point(ip1[1], ip2[0]))
+      distanceAndSegment.push(Distance.point2point(ip1[1], ip2[1]))
 
-  //       dist_and_segment.push(Distance.point2point(ip1[0], ip2[0]))
-  //       dist_and_segment.push(Distance.point2point(ip1[0], ip2[1]))
-  //       dist_and_segment.push(Distance.point2point(ip1[1], ip2[0]))
-  //       dist_and_segment.push(Distance.point2point(ip1[1], ip2[1]))
+      Distance.sort(distanceAndSegment)
+      return distanceAndSegment[0]
+    }
+  }
 
-  //       Distance.sort(dist_and_segment)
-  //       return dist_and_segment[0]
-  //     }
-  //   }
+  /**
+   * Calculate distance and shortest segment between two circles
+   * @param circle
+   * @param line
+   * @returns  distance and shortest segment
+   */
+  static circle2line(circle: Circle, line: Line): [number, Segment] {
+    const ip = circle.intersect(line)
+    if (ip.length > 0) {
+      return [0, new Segment(ip[0], ip[0])]
+    }
 
-  //   /**
-  //    * Calculate distance and shortest segment between two circles
-  //    * @param circle
-  //    * @param line
-  //    * @returns {Number | Segment} - distance and shortest segment
-  //    */
-  //   static circle2line(circle, line) {
-  //     const ip = circle.intersect(line)
-  //     if (ip.length > 0) {
-  //       return [0, new Segment(ip[0], ip[0])]
-  //     }
-
-  //     const [dist_from_center, shortest_segment_from_center] =
-  //       Distance.point2line(circle.center, line)
-  //     let [dist, shortest_segment] = Distance.point2circle(
-  //       shortest_segment_from_center.end,
-  //       circle
-  //     )
-  //     shortest_segment = shortest_segment.reverse()
-  //     return [dist, shortest_segment]
-  //   }
+    const [_, shortestSegmentFromCenter] = Distance.point2line(
+      circle.center,
+      line
+    )
+    const [dist, shortestSegment] = Distance.point2circle(
+      shortestSegmentFromCenter.end,
+      circle
+    )
+    return [dist, shortestSegment.reverse()]
+  }
 
   //   /**
   //    * Calculate distance and shortest segment between arc and line
@@ -310,52 +311,52 @@ export class Distance {
   //      * projection point belongs to segment AND
   //      * distance from projection point to circle belongs to arc  =>
   //      * return this distance from projection to circle */
-  //     const [dist_from_center, shortest_segment_from_center] =
+  //     const [distFromCenter, shortestSegmentFromCenter] =
   //       Distance.point2line(circle.center, line)
-  //     if (GE(dist_from_center, circle.r)) {
-  //       const [dist_from_projection, shortest_segment_from_projection] =
-  //         Distance.point2circle(shortest_segment_from_center.end, circle)
-  //       if (shortest_segment_from_projection.end.on(arc)) {
-  //         return [dist_from_projection, shortest_segment_from_projection]
+  //     if (GE(distFromCenter, circle.r)) {
+  //       const [distFromProjection, shortestSegmentFromProjection] =
+  //         Distance.point2circle(shortestSegmentFromCenter.end, circle)
+  //       if (shortestSegmentFromProjection.end.on(arc)) {
+  //         return [distFromProjection, shortestSegmentFromProjection]
   //       }
   //     } else {
-  //       const dist_and_segment = []
-  //       dist_and_segment.push(Distance.point2line(arc.start, line))
-  //       dist_and_segment.push(Distance.point2line(arc.end, line))
+  //       const distanceAndSegment = []
+  //       distanceAndSegment.push(Distance.point2line(arc.start, line))
+  //       distanceAndSegment.push(Distance.point2line(arc.end, line))
 
-  //       Distance.sort(dist_and_segment)
-  //       return dist_and_segment[0]
+  //       Distance.sort(distanceAndSegment)
+  //       return distanceAndSegment[0]
   //     }
   //   }
 
-  //   /**
-  //    * Calculate distance and shortest segment between arc and circle
-  //    * @param arc
-  //    * @param circle2
-  //    * @returns {Number | Segment} - distance and shortest segment
-  //    */
-  //   static arc2circle(arc, circle2) {
-  //     const ip = arc.intersect(circle2)
-  //     if (ip.length > 0) {
-  //       return [0, new Segment(ip[0], ip[0])]
-  //     }
+  /**
+   * Calculate distance and shortest segment between arc and circle
+   * @param arc
+   * @param circle2
+   * @returns distance and shortest segment
+   */
+  static arc2circle(arc: Arc, circle2: Circle): [number, Segment] {
+    const ip = arc.intersect(circle2)
+    if (ip.length > 0) {
+      return [0, new Segment(ip[0], ip[0])]
+    }
 
-  //     const circle1 = new Circle(arc.center, arc.r)
+    const circle1 = new Circle(arc.center, arc.r)
 
-  //     const [dist, shortest_segment] = Distance.circle2circle(circle1, circle2)
-  //     if (shortest_segment.start.on(arc)) {
-  //       return [dist, shortest_segment]
-  //     } else {
-  //       const dist_and_segment = []
+    const [dist, shortestSegment] = Distance.circle2circle(circle1, circle2)
+    if (shortestSegment.start.on(arc)) {
+      return [dist, shortestSegment]
+    } else {
+      const distanceAndSegment = []
 
-  //       dist_and_segment.push(Distance.point2circle(arc.start, circle2))
-  //       dist_and_segment.push(Distance.point2circle(arc.end, circle2))
+      distanceAndSegment.push(Distance.point2circle(arc.start, circle2))
+      distanceAndSegment.push(Distance.point2circle(arc.end, circle2))
 
-  //       Distance.sort(dist_and_segment)
+      Distance.sort(distanceAndSegment)
 
-  //       return dist_and_segment[0]
-  //     }
-  //   }
+      return distanceAndSegment[0]
+    }
+  }
 
   //   /**
   //    * Calculate distance and shortest segment between two arcs
@@ -372,45 +373,45 @@ export class Distance {
   //     const circle1 = new Circle(arc1.center, arc1.r)
   //     const circle2 = new Circle(arc2.center, arc2.r)
 
-  //     const [dist, shortest_segment] = Distance.circle2circle(circle1, circle2)
-  //     if (shortest_segment.start.on(arc1) && shortest_segment.end.on(arc2)) {
-  //       return [dist, shortest_segment]
+  //     const [dist, shortestSegment] = Distance.circle2circle(circle1, circle2)
+  //     if (shortestSegment.start.on(arc1) && shortestSegment.end.on(arc2)) {
+  //       return [dist, shortestSegment]
   //     } else {
-  //       const dist_and_segment = []
+  //       const distanceAndSegment = []
 
-  //       let dist_tmp, segment_tmp
-  //       ;[dist_tmp, segment_tmp] = Distance.point2arc(arc1.start, arc2)
-  //       if (segment_tmp.end.on(arc2)) {
-  //         dist_and_segment.push([dist_tmp, segment_tmp])
+  //       let distTmp, segmentTmp
+  //       ;[distTmp, segmentTmp] = Distance.point2arc(arc1.start, arc2)
+  //       if (segmentTmp.end.on(arc2)) {
+  //         distanceAndSegment.push([distTmp, segmentTmp])
   //       }
 
-  //       ;[dist_tmp, segment_tmp] = Distance.point2arc(arc1.end, arc2)
-  //       if (segment_tmp.end.on(arc2)) {
-  //         dist_and_segment.push([dist_tmp, segment_tmp])
+  //       ;[distTmp, segmentTmp] = Distance.point2arc(arc1.end, arc2)
+  //       if (segmentTmp.end.on(arc2)) {
+  //         distanceAndSegment.push([distTmp, segmentTmp])
   //       }
 
-  //       ;[dist_tmp, segment_tmp] = Distance.point2arc(arc2.start, arc1)
-  //       if (segment_tmp.end.on(arc1)) {
-  //         dist_and_segment.push([dist_tmp, segment_tmp.reverse()])
+  //       ;[distTmp, segmentTmp] = Distance.point2arc(arc2.start, arc1)
+  //       if (segmentTmp.end.on(arc1)) {
+  //         distanceAndSegment.push([distTmp, segmentTmp.reverse()])
   //       }
 
-  //       ;[dist_tmp, segment_tmp] = Distance.point2arc(arc2.end, arc1)
-  //       if (segment_tmp.end.on(arc1)) {
-  //         dist_and_segment.push([dist_tmp, segment_tmp.reverse()])
+  //       ;[distTmp, segmentTmp] = Distance.point2arc(arc2.end, arc1)
+  //       if (segmentTmp.end.on(arc1)) {
+  //         distanceAndSegment.push([distTmp, segmentTmp.reverse()])
   //       }
 
-  //       ;[dist_tmp, segment_tmp] = Distance.point2point(arc1.start, arc2.start)
-  //       dist_and_segment.push([dist_tmp, segment_tmp])
-  //       ;[dist_tmp, segment_tmp] = Distance.point2point(arc1.start, arc2.end)
-  //       dist_and_segment.push([dist_tmp, segment_tmp])
-  //       ;[dist_tmp, segment_tmp] = Distance.point2point(arc1.end, arc2.start)
-  //       dist_and_segment.push([dist_tmp, segment_tmp])
-  //       ;[dist_tmp, segment_tmp] = Distance.point2point(arc1.end, arc2.end)
-  //       dist_and_segment.push([dist_tmp, segment_tmp])
+  //       ;[distTmp, segmentTmp] = Distance.point2point(arc1.start, arc2.start)
+  //       distanceAndSegment.push([distTmp, segmentTmp])
+  //       ;[distTmp, segmentTmp] = Distance.point2point(arc1.start, arc2.end)
+  //       distanceAndSegment.push([distTmp, segmentTmp])
+  //       ;[distTmp, segmentTmp] = Distance.point2point(arc1.end, arc2.start)
+  //       distanceAndSegment.push([distTmp, segmentTmp])
+  //       ;[distTmp, segmentTmp] = Distance.point2point(arc1.end, arc2.end)
+  //       distanceAndSegment.push([distTmp, segmentTmp])
 
-  //       Distance.sort(dist_and_segment)
+  //       Distance.sort(distanceAndSegment)
 
-  //       return dist_and_segment[0]
+  //       return distanceAndSegment[0]
   //     }
   //   }
 
@@ -421,28 +422,28 @@ export class Distance {
   //    * @returns {Number | Segment} - distance and shortest segment
   //    */
   //   static point2polygon(point, polygon) {
-  //     let min_dist_and_segment = [Number.POSITIVE_INFINITY, new Segment()]
+  //     let min_distanceAndSegment = [Number.POSITIVE_INFINITY, new Segment()]
   //     for (const edge of polygon.edges) {
-  //       const [dist, shortest_segment] =
+  //       const [dist, shortestSegment] =
   //         edge.shape instanceof Segment
   //           ? Distance.point2segment(point, edge.shape)
   //           : Distance.point2arc(point, edge.shape)
-  //       if (LT(dist, min_dist_and_segment[0])) {
-  //         min_dist_and_segment = [dist, shortest_segment]
+  //       if (LT(dist, min_distanceAndSegment[0])) {
+  //         min_distanceAndSegment = [dist, shortestSegment]
   //       }
   //     }
-  //     return min_dist_and_segment
+  //     return min_distanceAndSegment
   //   }
 
   //   static shape2polygon(shape, polygon) {
-  //     let min_dist_and_segment = [Number.POSITIVE_INFINITY, new Segment()]
+  //     let min_distanceAndSegment = [Number.POSITIVE_INFINITY, new Segment()]
   //     for (const edge of polygon.edges) {
-  //       const [dist, shortest_segment] = shape.distanceTo(edge.shape)
-  //       if (LT(dist, min_dist_and_segment[0])) {
-  //         min_dist_and_segment = [dist, shortest_segment]
+  //       const [dist, shortestSegment] = shape.distanceTo(edge.shape)
+  //       if (LT(dist, min_distanceAndSegment[0])) {
+  //         min_distanceAndSegment = [dist, shortestSegment]
   //       }
   //     }
-  //     return min_dist_and_segment
+  //     return min_distanceAndSegment
   //   }
 
   //   /**
@@ -452,16 +453,16 @@ export class Distance {
   //    * @returns {Number | Segment} - distance and shortest segment
   //    */
   //   static polygon2polygon(polygon1, polygon2) {
-  //     let min_dist_and_segment = [Number.POSITIVE_INFINITY, new Segment()]
+  //     let min_distanceAndSegment = [Number.POSITIVE_INFINITY, new Segment()]
   //     for (const edge1 of polygon1.edges) {
   //       for (const edge2 of polygon2.edges) {
-  //         const [dist, shortest_segment] = edge1.shape.distanceTo(edge2.shape)
-  //         if (LT(dist, min_dist_and_segment[0])) {
-  //           min_dist_and_segment = [dist, shortest_segment]
+  //         const [dist, shortestSegment] = edge1.shape.distanceTo(edge2.shape)
+  //         if (LT(dist, min_distanceAndSegment[0])) {
+  //           min_distanceAndSegment = [dist, shortestSegment]
   //         }
   //       }
   //     }
-  //     return min_dist_and_segment
+  //     return min_distanceAndSegment
   //   }
 
   //   /**
@@ -566,44 +567,44 @@ export class Distance {
   //     return tree
   //   }
 
-  //   static minmax_tree_calc_distance(shape, node, min_dist_and_segment) {
-  //     let min_dist_and_segment_new, stop
+  //   static minmax_tree_calc_distance(shape, node, min_distanceAndSegment) {
+  //     let min_distanceAndSegment_new, stop
   //     if (node != null && !node.isNil()) {
-  //       ;[min_dist_and_segment_new, stop] = Distance.minmax_tree_calc_distance(
+  //       ;[min_distanceAndSegment_new, stop] = Distance.minmax_tree_calc_distance(
   //         shape,
   //         node.left,
-  //         min_dist_and_segment
+  //         min_distanceAndSegment
   //       )
 
   //       if (stop) {
-  //         return [min_dist_and_segment_new, stop]
+  //         return [min_distanceAndSegment_new, stop]
   //       }
 
   //       if (
   //         LT(
-  //           min_dist_and_segment_new[0],
+  //           min_distanceAndSegment_new[0],
   //           Math.sqrt(node.item.key.low)
   //         )
   //       ) {
-  //         return [min_dist_and_segment_new, true] // stop condition
+  //         return [min_distanceAndSegment_new, true] // stop condition
   //       }
 
-  //       const [dist, shortest_segment] = Distance.distance(shape, node.item.value)
+  //       const [dist, shortestSegment] = Distance.distance(shape, node.item.value)
   //       // console.log(dist)
-  //       if (LT(dist, min_dist_and_segment_new[0])) {
-  //         min_dist_and_segment_new = [dist, shortest_segment]
+  //       if (LT(dist, min_distanceAndSegment_new[0])) {
+  //         min_distanceAndSegment_new = [dist, shortestSegment]
   //       }
 
-  //       ;[min_dist_and_segment_new, stop] = Distance.minmax_tree_calc_distance(
+  //       ;[min_distanceAndSegment_new, stop] = Distance.minmax_tree_calc_distance(
   //         shape,
   //         node.right,
-  //         min_dist_and_segment_new
+  //         min_distanceAndSegment_new
   //       )
 
-  //       return [min_dist_and_segment_new, stop]
+  //       return [min_distanceAndSegment_new, stop]
   //     }
 
-  //     return [min_dist_and_segment, false]
+  //     return [min_distanceAndSegment, false]
   //   }
 
   //   /**
@@ -614,17 +615,17 @@ export class Distance {
   //    * @returns {*}
   //    */
   //   static shape2planarSet(shape, set, min_stop = Number.POSITIVE_INFINITY) {
-  //     let min_dist_and_segment = [min_stop, new Segment()]
+  //     let min_distanceAndSegment = [min_stop, new Segment()]
   //     let stop = false
   //     if (set instanceof PlanarSet) {
   //       const tree = Distance.minmax_tree(shape, set, min_stop)
-  //       ;[min_dist_and_segment, stop] = Distance.minmax_tree_calc_distance(
+  //       ;[min_distanceAndSegment, stop] = Distance.minmax_tree_calc_distance(
   //         shape,
   //         tree.root,
-  //         min_dist_and_segment
+  //         min_distanceAndSegment
   //       )
   //     }
-  //     return min_dist_and_segment
+  //     return min_distanceAndSegment
   //   }
 
   /**
