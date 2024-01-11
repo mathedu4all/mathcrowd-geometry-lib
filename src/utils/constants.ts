@@ -1,5 +1,3 @@
-import { getTolerance } from './utils'
-
 /**
  * Global constant CCW defines counterclockwise direction of arc
  * @type {boolean}

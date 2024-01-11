@@ -1,5 +1,15 @@
 import { Utils } from '..'
 
+/**
+ * Config Object supporting read and write.
+ * @example
+ * ```js
+ * // Get the current tolerance
+ * const tol = Config.DP_TOL
+ * // Set the tolerance to 0.00001
+ * Config.DP_TOL = 0.00001
+ * ```
+ */
 const Config: {
   DP_TOL: number
 } = {

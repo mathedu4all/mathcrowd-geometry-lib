@@ -9,6 +9,7 @@ import { Errors } from '../utils/errors'
 import { Distance } from '../algorithms/distance'
 import { Segment } from './segment'
 import { Circle } from './circle'
+import { Arc } from './arc'
 /**
  * Class representing a line
  * @type {Line}
@@ -229,9 +230,9 @@ export class Line extends Shape<Line> {
     //   return Intersection.intersectSegment2Line(shape, this)
     // }
 
-    // if (shape instanceof Arc) {
-    //   return Intersection.intersectLine2Arc(this, shape)
-    // }
+    if (shape instanceof Arc) {
+      return Intersection.intersectLine2Arc(this, shape)
+    }
 
     // if (shape instanceof Polygon) {
     //   return Intersection.intersectLine2Polygon(this, shape)
@@ -240,7 +241,7 @@ export class Line extends Shape<Line> {
   }
 
   /**
-   * Calculate distance and shortest segment from line to shape and returns array [distance, shortest_segment]
+   * Calculate distance and shortest segment from line to shape and returns array [distance, shortestSegment]
    * @param {Shape} shape Shape of the one of the types Point, Circle, Segment, Arc, Polygon
    * @returns {[number, Segment]}
    */
@@ -251,25 +252,24 @@ export class Line extends Shape<Line> {
       return [distance, shortestSegment.reverse()]
     }
 
-    //   if (shape instanceof Circle) {
-    //     let [distance, shortest_segment] = Distance.circle2line(shape, this)
-    //     shortest_segment = shortest_segment.reverse()
-    //     return [distance, shortest_segment]
-    //   }
+    if (shape instanceof Circle) {
+      const [distance, shortestSegment] = Distance.circle2line(shape, this)
+      return [distance, shortestSegment.reverse()]
+    }
 
-    //   if (shape instanceof Segment) {
-    //     const [distance, shortest_segment] = Distance.segment2line(shape, this)
-    //     return [distance, shortest_segment.reverse()]
-    //   }
+    if (shape instanceof Segment) {
+      const [distance, shortestSegment] = Distance.segment2line(shape, this)
+      return [distance, shortestSegment.reverse()]
+    }
 
-    //   if (shape instanceof Arc) {
-    //     const [distance, shortest_segment] = Distance.arc2line(shape, this)
-    //     return [distance, shortest_segment.reverse()]
-    //   }
+    if (shape instanceof Arc) {
+      const [distance, shortestSegment] = Distance.arc2line(shape, this)
+      return [distance, shortestSegment.reverse()]
+    }
 
     //   if (shape instanceof Polygon) {
-    //     const [distance, shortest_segment] = Distance.shape2polygon(this, shape)
-    //     return [distance, shortest_segment]
+    //     const [distance, shortestSegment] = Distance.shape2polygon(this, shape)
+    //     return [distance, shortestSegment]
     //   }
 
     throw Errors.OPERATION_IS_NOT_SUPPORTED

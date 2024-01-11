@@ -211,9 +211,9 @@ export class Point extends Shape<Point> implements SimplePoint {
     //   return shape.contains(this)
     // }
 
-    // if (shape instanceof Flatten.Circle) {
-    //   return shape.contains(this)
-    // }
+    if (shape instanceof Circle) {
+      return shape.contains(this)
+    }
 
     if (shape instanceof Segment) {
       return shape.contains(this)

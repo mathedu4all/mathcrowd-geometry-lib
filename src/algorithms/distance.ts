@@ -292,42 +292,44 @@ export class Distance {
     return [dist, shortestSegment.reverse()]
   }
 
-  //   /**
-  //    * Calculate distance and shortest segment between arc and line
-  //    * @param arc
-  //    * @param line
-  //    * @returns {Number | Segment} - distance and shortest segment
-  //    */
-  //   static arc2line(arc, line) {
-  //     /* Case 1 Line and arc intersected. Return the first point and zero distance */
-  //     const ip = line.intersect(arc)
-  //     if (ip.length > 0) {
-  //       return [0, new Segment(ip[0], ip[0])]
-  //     }
+  /**
+   * Calculate distance and shortest segment between arc and line
+   * @param arc
+   * @param line
+   * @returns distance and shortest segment
+   */
+  static arc2line(arc: Arc, line: Line): [number, Segment] {
+    /* Case 1 Line and arc intersected. Return the first point and zero distance */
+    const ip = line.intersect(arc)
+    if (ip.length > 0) {
+      return [0, new Segment(ip[0], ip[0])]
+    }
 
-  //     const circle = new Circle(arc.center, arc.r)
+    const circle = new Circle(arc.center, arc.r)
 
-  //     /* Case 2. Distance to projection of center point to line bigger than radius AND
-  //      * projection point belongs to segment AND
-  //      * distance from projection point to circle belongs to arc  =>
-  //      * return this distance from projection to circle */
-  //     const [distFromCenter, shortestSegmentFromCenter] =
-  //       Distance.point2line(circle.center, line)
-  //     if (GE(distFromCenter, circle.r)) {
-  //       const [distFromProjection, shortestSegmentFromProjection] =
-  //         Distance.point2circle(shortestSegmentFromCenter.end, circle)
-  //       if (shortestSegmentFromProjection.end.on(arc)) {
-  //         return [distFromProjection, shortestSegmentFromProjection]
-  //       }
-  //     } else {
-  //       const distanceAndSegment = []
-  //       distanceAndSegment.push(Distance.point2line(arc.start, line))
-  //       distanceAndSegment.push(Distance.point2line(arc.end, line))
+    /* Case 2. Distance to projection of center point to line bigger than radius AND
+     * projection point belongs to segment AND
+     * distance from projection point to circle belongs to arc  =>
+     * return this distance from projection to circle */
+    const [distFromCenter, shortestSegmentFromCenter] = Distance.point2line(
+      circle.center,
+      line
+    )
+    if (GE(distFromCenter, circle.r)) {
+      const [distFromProjection, shortestSegmentFromProjection] =
+        Distance.point2circle(shortestSegmentFromCenter.end, circle)
+      if (shortestSegmentFromProjection.end.on(arc)) {
+        return [distFromProjection, shortestSegmentFromProjection]
+      }
+    }
 
-  //       Distance.sort(distanceAndSegment)
-  //       return distanceAndSegment[0]
-  //     }
-  //   }
+    const distanceAndSegment: [number, Segment][] = []
+    distanceAndSegment.push(Distance.point2line(arc.start, line))
+    distanceAndSegment.push(Distance.point2line(arc.end, line))
+
+    Distance.sort(distanceAndSegment)
+    return distanceAndSegment[0]
+  }
 
   /**
    * Calculate distance and shortest segment between arc and circle
@@ -358,62 +360,62 @@ export class Distance {
     }
   }
 
-  //   /**
-  //    * Calculate distance and shortest segment between two arcs
-  //    * @param arc1
-  //    * @param arc2
-  //    * @returns {Number | Segment} - distance and shortest segment
-  //    */
-  //   static arc2arc(arc1, arc2) {
-  //     const ip = arc1.intersect(arc2)
-  //     if (ip.length > 0) {
-  //       return [0, new Segment(ip[0], ip[0])]
-  //     }
+  /**
+   * Calculate distance and shortest segment between two arcs
+   * @param arc1
+   * @param arc2
+   * @returns {Number | Segment} - distance and shortest segment
+   */
+  static arc2arc(arc1: Arc, arc2: Arc): [number, Segment] {
+    const ip = arc1.intersect(arc2)
+    if (ip.length > 0) {
+      return [0, new Segment(ip[0], ip[0])]
+    }
 
-  //     const circle1 = new Circle(arc1.center, arc1.r)
-  //     const circle2 = new Circle(arc2.center, arc2.r)
+    const circle1 = new Circle(arc1.center, arc1.r)
+    const circle2 = new Circle(arc2.center, arc2.r)
 
-  //     const [dist, shortestSegment] = Distance.circle2circle(circle1, circle2)
-  //     if (shortestSegment.start.on(arc1) && shortestSegment.end.on(arc2)) {
-  //       return [dist, shortestSegment]
-  //     } else {
-  //       const distanceAndSegment = []
+    const [dist, shortestSegment] = Distance.circle2circle(circle1, circle2)
+    if (shortestSegment.start.on(arc1) && shortestSegment.end.on(arc2)) {
+      return [dist, shortestSegment]
+    } else {
+      const distanceAndSegment: [number, Segment][] = []
 
-  //       let distTmp, segmentTmp
-  //       ;[distTmp, segmentTmp] = Distance.point2arc(arc1.start, arc2)
-  //       if (segmentTmp.end.on(arc2)) {
-  //         distanceAndSegment.push([distTmp, segmentTmp])
-  //       }
+      let distTmp, segmentTmp
+      ;[distTmp, segmentTmp] = Distance.point2arc(arc1.start, arc2)
+      if (segmentTmp.end.on(arc2)) {
+        distanceAndSegment.push([distTmp, segmentTmp])
+      }
 
-  //       ;[distTmp, segmentTmp] = Distance.point2arc(arc1.end, arc2)
-  //       if (segmentTmp.end.on(arc2)) {
-  //         distanceAndSegment.push([distTmp, segmentTmp])
-  //       }
+      ;[distTmp, segmentTmp] = Distance.point2arc(arc1.end, arc2)
+      if (segmentTmp.end.on(arc2)) {
+        distanceAndSegment.push([distTmp, segmentTmp])
+      }
 
-  //       ;[distTmp, segmentTmp] = Distance.point2arc(arc2.start, arc1)
-  //       if (segmentTmp.end.on(arc1)) {
-  //         distanceAndSegment.push([distTmp, segmentTmp.reverse()])
-  //       }
+      ;[distTmp, segmentTmp] = Distance.point2arc(arc2.start, arc1)
+      if (segmentTmp.end.on(arc1)) {
+        distanceAndSegment.push([distTmp, segmentTmp.reverse()])
+      }
 
-  //       ;[distTmp, segmentTmp] = Distance.point2arc(arc2.end, arc1)
-  //       if (segmentTmp.end.on(arc1)) {
-  //         distanceAndSegment.push([distTmp, segmentTmp.reverse()])
-  //       }
+      ;[distTmp, segmentTmp] = Distance.point2arc(arc2.end, arc1)
+      if (segmentTmp.end.on(arc1)) {
+        distanceAndSegment.push([distTmp, segmentTmp.reverse()])
+      }
 
-  //       ;[distTmp, segmentTmp] = Distance.point2point(arc1.start, arc2.start)
-  //       distanceAndSegment.push([distTmp, segmentTmp])
-  //       ;[distTmp, segmentTmp] = Distance.point2point(arc1.start, arc2.end)
-  //       distanceAndSegment.push([distTmp, segmentTmp])
-  //       ;[distTmp, segmentTmp] = Distance.point2point(arc1.end, arc2.start)
-  //       distanceAndSegment.push([distTmp, segmentTmp])
-  //       ;[distTmp, segmentTmp] = Distance.point2point(arc1.end, arc2.end)
-  //       distanceAndSegment.push([distTmp, segmentTmp])
+      ;[distTmp, segmentTmp] = Distance.point2point(arc1.start, arc2.start)
+      distanceAndSegment.push([distTmp, segmentTmp])
+      ;[distTmp, segmentTmp] = Distance.point2point(arc1.start, arc2.end)
+      distanceAndSegment.push([distTmp, segmentTmp])
+      ;[distTmp, segmentTmp] = Distance.point2point(arc1.end, arc2.start)
+      distanceAndSegment.push([distTmp, segmentTmp])
+      ;[distTmp, segmentTmp] = Distance.point2point(arc1.end, arc2.end)
+      distanceAndSegment.push([distTmp, segmentTmp])
 
-  //       Distance.sort(distanceAndSegment)
+      Distance.sort(distanceAndSegment)
 
-  //       return distanceAndSegment[0]
-  //     }
-  //   }
+      return distanceAndSegment[0]
+    }
+  }
 
   //   /**
   //    * Calculate distance and shortest segment between point and polygon

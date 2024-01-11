@@ -250,9 +250,9 @@ export class Arc extends Shape<Arc> {
 
   /**
    * Returns chord height ("sagitta") of the arc
-   * @returns {number}
+   * @returns
    */
-  chordHeight() {
+  chordHeight(): number {
     return (1.0 - Math.cos(Math.abs(this.sweep / 2.0))) * this.r
   }
 
@@ -297,32 +297,30 @@ export class Arc extends Shape<Arc> {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   distanceTo(shape: Shape<any>): [number, Segment] {
-    // if (shape instanceof Point) {
-    //   let [dist, shortestSegment] = Distance.point2arc(shape, this)
-    //   shortestSegment = shortestSegment.reverse()
-    //   return [dist, shortestSegment]
-    // }
+    if (shape instanceof Point) {
+      const [dist, shortestSegment] = Distance.point2arc(shape, this)
+      return [dist, shortestSegment.reverse()]
+    }
 
-    // if (shape instanceof Circle) {
-    //   const [dist, shortestSegment] = Distance.arc2circle(this, shape)
-    //   return [dist, shortestSegment]
-    // }
+    if (shape instanceof Circle) {
+      const [dist, shortestSegment] = Distance.arc2circle(this, shape)
+      return [dist, shortestSegment]
+    }
 
-    // if (shape instanceof Line) {
-    //   const [dist, shortestSegment] = Distance.arc2line(this, shape)
-    //   return [dist, shortestSegment]
-    // }
+    if (shape instanceof Line) {
+      const [dist, shortestSegment] = Distance.arc2line(this, shape)
+      return [dist, shortestSegment]
+    }
 
-    // if (shape instanceof Segment) {
-    //   let [dist, shortestSegment] = Distance.segment2arc(shape, this)
-    //   shortestSegment = shortestSegment.reverse()
-    //   return [dist, shortestSegment]
-    // }
+    if (shape instanceof Segment) {
+      const [dist, shortestSegment] = Distance.segment2arc(shape, this)
+      return [dist, shortestSegment.reverse()]
+    }
 
-    // if (shape instanceof Arc) {
-    //   const [dist, shortestSegment] = Distance.arc2arc(this, shape)
-    //   return [dist, shortestSegment]
-    // }
+    if (shape instanceof Arc) {
+      const [dist, shortestSegment] = Distance.arc2arc(this, shape)
+      return [dist, shortestSegment]
+    }
 
     // if (shape instanceof Polygon) {
     //   const [dist, shortestSegment] = Distance.shape2polygon(this, shape)
