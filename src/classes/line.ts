@@ -10,6 +10,7 @@ import { Distance } from '../algorithms/distance'
 import { Segment } from './segment'
 import { Circle } from './circle'
 import { Arc } from './arc'
+import { Ray } from './ray'
 /**
  * Class representing a line
  * @type {Line}
@@ -214,21 +215,21 @@ export class Line extends Shape<Line> {
       return Intersection.intersectLine2Line(this, shape)
     }
 
-    // if (shape instanceof Ray) {
-    //   return Intersection.intersectRay2Line(shape, this)
-    // }
+    if (shape instanceof Ray) {
+      return Intersection.intersectRay2Line(shape, this)
+    }
 
     if (shape instanceof Circle) {
       return Intersection.intersectLine2Circle(this, shape)
     }
 
-    // if (shape instanceof Box) {
-    //   return Intersection.intersectLine2Box(this, shape)
-    // }
+    if (shape instanceof Box) {
+      return Intersection.intersectLine2Box(this, shape)
+    }
 
-    // if (shape instanceof Segment) {
-    //   return Intersection.intersectSegment2Line(shape, this)
-    // }
+    if (shape instanceof Segment) {
+      return Intersection.intersectSegment2Line(shape, this)
+    }
 
     if (shape instanceof Arc) {
       return Intersection.intersectLine2Arc(this, shape)
@@ -275,22 +276,22 @@ export class Line extends Shape<Line> {
     throw Errors.OPERATION_IS_NOT_SUPPORTED
   }
 
-  // /**
-  //  * Split line with a point or array of points and return array of shapes
-  //  * Assumed (but not checked) that all points lay on the line
-  //  * @param {Point | Point[]} pt
-  //  * @returns {MultilineShapes}
-  //  */
-  // split(pt) {
-  //   if (pt instanceof Point) {
-  //     return [new Ray(pt, this.norm.invert()), new Ray(pt, this.norm)]
-  //   } else {
-  //     const multiline = new Multiline([this])
-  //     const sorted_points = this.sortPoints(pt)
-  //     multiline.split(sorted_points)
-  //     return multiline.toShapes()
-  //   }
-  // }
+  /**
+   * Split line with a point or array of points and return array of shapes
+   * Assumed (but not checked) that all points lay on the line
+   * @param  pt
+   * @returns {MultilineShapes}
+   */
+  split(pt: Point | Point[]) {
+    if (pt instanceof Point) {
+      return [new Ray(pt, this.norm.invert()), new Ray(pt, this.norm)]
+    } else {
+      // const multiline = new Multiline([this])
+      // const sorted_points = this.sortPoints(pt)
+      // multiline.split(sorted_points)
+      // return multiline.toShapes()
+    }
+  }
 
   /**
    * Rotate line by angle and center point.
@@ -332,6 +333,7 @@ export class Line extends Shape<Line> {
   get name() {
     return 'line'
   }
+
   static points2norm(pt1: Point, pt2: Point) {
     if (pt1.equalTo(pt2)) {
       throw Errors.ILLEGAL_PARAMETERS

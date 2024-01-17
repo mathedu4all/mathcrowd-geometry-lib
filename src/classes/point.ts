@@ -10,6 +10,7 @@ import { Errors } from '../utils/errors'
 import { Distance } from '../algorithms/distance'
 import { Arc } from './arc'
 import { Circle } from './circle'
+import { Ray } from './ray'
 
 // import { Vector } from './vector'
 
@@ -207,9 +208,9 @@ export class Point extends Shape<Point> implements SimplePoint {
       return shape.contains(this)
     }
 
-    // if (shape instanceof Flatten.Ray) {
-    //   return shape.contains(this)
-    // }
+    if (shape instanceof Ray) {
+      return shape.contains(this)
+    }
 
     if (shape instanceof Circle) {
       return shape.contains(this)

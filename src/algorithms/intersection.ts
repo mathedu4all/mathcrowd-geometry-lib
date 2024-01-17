@@ -3,6 +3,7 @@ import { Box } from '../classes/box'
 import { Circle } from '../classes/circle'
 import { Line } from '../classes/line'
 import { Point } from '../classes/point'
+import { Ray } from '../classes/ray'
 import { Segment } from '../classes/segment'
 import { Vector } from '../classes/vector'
 import { EQ, EQ_0, GE, GT, LE, LT } from '../utils/utils'
@@ -260,16 +261,16 @@ export function intersectSegment2Arc(segment: Segment, arc: Arc): Point[] {
   return ip
 }
 
-// export function intersectSegment2Box(segment, box) {
-//   const ips = []
-//   for (const seg of box.toSegments()) {
-//     const ipsTmp = intersectSegment2Segment(seg, segment)
-//     for (const ip of ipsTmp) {
-//       ips.push(ip)
-//     }
-//   }
-//   return ips
-// }
+export function intersectSegment2Box(segment: Segment, box: Box): Point[] {
+  const ips = []
+  for (const seg of box.toSegments()) {
+    const ipsTmp = intersectSegment2Segment(seg, segment)
+    for (const ip of ipsTmp) {
+      ips.push(ip)
+    }
+  }
+  return ips
+}
 
 export function intersectCircle2Circle(
   circle1: Circle,
@@ -340,16 +341,16 @@ export function intersectCircle2Circle(
   return ip
 }
 
-// export function intersectCircle2Box(circle, box) {
-//   const ips = []
-//   for (const seg of box.toSegments()) {
-//     const ipsTmp = intersectSegment2Circle(seg, circle)
-//     for (const ip of ipsTmp) {
-//       ips.push(ip)
-//     }
-//   }
-//   return ips
-// }
+export function intersectCircle2Box(circle: Circle, box: Box): Point[] {
+  const ips = []
+  for (const seg of box.toSegments()) {
+    const ipsTmp = intersectSegment2Circle(seg, circle)
+    for (const ip of ipsTmp) {
+      ips.push(ip)
+    }
+  }
+  return ips
+}
 
 export function intersectArc2Arc(arc1: Arc, arc2: Arc): Point[] {
   const ip: Point[] = []
@@ -417,16 +418,16 @@ export function intersectArc2Circle(arc: Arc, circle: Circle): Point[] {
   return ip
 }
 
-// export function intersectArc2Box(arc, box) {
-//   const ips = []
-//   for (const seg of box.toSegments()) {
-//     const ipsTmp = intersectSegment2Arc(seg, arc)
-//     for (const ip of ipsTmp) {
-//       ips.push(ip)
-//     }
-//   }
-//   return ips
-// }
+export function intersectArc2Box(arc: Arc, box: Box) {
+  const ips = []
+  for (const seg of box.toSegments()) {
+    const ipsTmp = intersectSegment2Arc(seg, arc)
+    for (const ip of ipsTmp) {
+      ips.push(ip)
+    }
+  }
+  return ips
+}
 
 // export function intersectEdge2Segment(edge, segment) {
 //   return edge.isSegment()
@@ -576,17 +577,17 @@ export function intersectArc2Circle(arc: Arc, circle: Circle): Point[] {
 //   return ip
 // }
 
-// export function intersectBox2Box(box1, box2) {
-//   const ip = []
-//   for (const segment1 of box1.toSegments()) {
-//     for (const segment2 of box2.toSegments()) {
-//       for (const pt of intersectSegment2Segment(segment1, segment2)) {
-//         ip.push(pt)
-//       }
-//     }
-//   }
-//   return ip
-// }
+export function intersectBox2Box(box1: Box, box2: Box): Point[] {
+  const ip = []
+  for (const segment1 of box1.toSegments()) {
+    for (const segment2 of box2.toSegments()) {
+      for (const pt of intersectSegment2Segment(segment1, segment2)) {
+        ip.push(pt)
+      }
+    }
+  }
+  return ip
+}
 
 // export function intersectShape2Polygon(shape, polygon) {
 //   if (shape instanceof Line) {
@@ -604,44 +605,44 @@ function ptInIntPoints(newPt: Point, ip: Point[]): boolean {
   return ip.some((pt) => pt.equalTo(newPt))
 }
 
-// function createLineFromRay(ray) {
-//   return new Line(ray.start, ray.norm)
-// }
-// export function intersectRay2Segment(ray, segment) {
-//   return intersectSegment2Line(segment, createLineFromRay(ray)).filter((pt) =>
-//     ray.contains(pt)
-//   )
-// }
+function createLineFromRay(ray: Ray) {
+  return new Line(ray.start, ray.norm)
+}
+export function intersectRay2Segment(ray: Ray, segment: Segment): Point[] {
+  return intersectSegment2Line(segment, createLineFromRay(ray)).filter((pt) =>
+    ray.contains(pt)
+  )
+}
 
-// export function intersectRay2Arc(ray, arc) {
-//   return intersectLine2Arc(createLineFromRay(ray), arc).filter((pt) =>
-//     ray.contains(pt)
-//   )
-// }
+export function intersectRay2Arc(ray: Ray, arc: Arc): Point[] {
+  return intersectLine2Arc(createLineFromRay(ray), arc).filter((pt) =>
+    ray.contains(pt)
+  )
+}
 
-// export function intersectRay2Circle(ray, circle) {
-//   return intersectLine2Circle(createLineFromRay(ray), circle).filter((pt) =>
-//     ray.contains(pt)
-//   )
-// }
+export function intersectRay2Circle(ray: Ray, circle: Circle) {
+  return intersectLine2Circle(createLineFromRay(ray), circle).filter((pt) =>
+    ray.contains(pt)
+  )
+}
 
-// export function intersectRay2Box(ray, box) {
-//   return intersectLine2Box(createLineFromRay(ray), box).filter((pt) =>
-//     ray.contains(pt)
-//   )
-// }
+export function intersectRay2Box(ray: Ray, box: Box) {
+  return intersectLine2Box(createLineFromRay(ray), box).filter((pt) =>
+    ray.contains(pt)
+  )
+}
 
-// export function intersectRay2Line(ray, line) {
-//   return intersectLine2Line(createLineFromRay(ray), line).filter((pt) =>
-//     ray.contains(pt)
-//   )
-// }
+export function intersectRay2Line(ray: Ray, line: Line) {
+  return intersectLine2Line(createLineFromRay(ray), line).filter((pt) =>
+    ray.contains(pt)
+  )
+}
 
-// export function intersectRay2Ray(ray1, ray2) {
-//   return intersectLine2Line(createLineFromRay(ray1), createLineFromRay(ray2))
-//     .filter((pt) => ray1.contains(pt))
-//     .filter((pt) => ray2.contains(pt))
-// }
+export function intersectRay2Ray(ray1: Ray, ray2: Ray) {
+  return intersectLine2Line(createLineFromRay(ray1), createLineFromRay(ray2))
+    .filter((pt) => ray1.contains(pt))
+    .filter((pt) => ray2.contains(pt))
+}
 
 // export function intersectRay2Polygon(ray, polygon) {
 //   return intersectLine2Polygon(createLineFromRay(ray), polygon).filter((pt) =>

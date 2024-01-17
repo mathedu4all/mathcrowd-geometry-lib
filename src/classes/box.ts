@@ -3,6 +3,11 @@ import { Errors } from '../utils/errors'
 import { Matrix } from './matrix'
 import { Point } from './point'
 import { Segment } from './segment'
+import { Circle } from './circle'
+import { Arc } from './arc'
+import { intersectSegment2Arc } from '../algorithms/intersection'
+import { Line } from './line'
+import { Ray } from './ray'
 
 /**
  * Class Box represents bounding box of the shape.
@@ -264,32 +269,30 @@ export class Box extends Shape<Box> {
       )
     }
 
-    throw Errors.OPERATION_IS_NOT_SUPPORTED
+    if (shape instanceof Segment) {
+      return shape.vertices.every((vertex) => this.contains(vertex))
+    }
 
-    // if (shape instanceof Flatten.Segment) {
-    //   return shape.vertices.every((vertex) => this.contains(vertex))
-    // }
+    if (shape instanceof Box) {
+      return shape.toSegments().every((segment) => this.contains(segment))
+    }
 
-    // if (shape instanceof Box) {
-    //   return shape.toSegments().every((segment) => this.contains(segment))
-    // }
+    if (shape instanceof Circle) {
+      return this.contains(shape.box)
+    }
 
-    // if (shape instanceof Flatten.Circle) {
-    //   return this.contains(shape.box)
-    // }
+    if (shape instanceof Arc) {
+      return (
+        shape.vertices.every((vertex) => this.contains(vertex)) &&
+        this.toSegments().every(
+          (segment) => intersectSegment2Arc(segment, shape).length === 0
+        )
+      )
+    }
 
-    // if (shape instanceof Flatten.Arc) {
-    //   return (
-    //     shape.vertices.every((vertex) => this.contains(vertex)) &&
-    //     shape
-    //       .toSegments()
-    //       .every((segment) => intersectSegment2Arc(segment, shape).length === 0)
-    //   )
-    // }
-
-    // if (shape instanceof Flatten.Line || shape instanceof Flatten.Ray) {
-    //   return false
-    // }
+    if (shape instanceof Line || shape instanceof Ray) {
+      return false
+    }
 
     // if (shape instanceof Flatten.Multiline) {
     //   return shape.toShapes().every((shape) => this.contains(shape))
@@ -298,6 +301,8 @@ export class Box extends Shape<Box> {
     // if (shape instanceof Flatten.Polygon) {
     //   return this.contains(shape.box)
     // }
+
+    throw Errors.OPERATION_IS_NOT_SUPPORTED
   }
 
   get name() {

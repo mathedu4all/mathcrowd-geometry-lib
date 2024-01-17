@@ -11,6 +11,7 @@ import { Segment } from './segment'
 import { Distance } from '../algorithms/distance'
 import { Matrix } from './matrix'
 import { Circle } from './circle'
+import { Ray } from './ray'
 
 /**
  * Class representing a circular arc
@@ -187,25 +188,25 @@ export class Arc extends Shape<Arc> {
     return LE(testArc.length, this.length)
   }
 
-  // /**
-  //  * When given point belongs to arc, return array of two arcs split by this point. If points is incident
-  //  * to start or end point of the arc, return clone of the arc. If point does not belong to the arcs, return
-  //  * empty array.
-  //  * @param {Point} pt Query point
-  //  * @returns {Arc[]}
-  //  */
-  // split(pt) {
-  //   if (this.start.equalTo(pt)) return [null, this.clone()]
+  /**
+   * When given point belongs to arc, return array of two arcs split by this point. If points is incident
+   * to start or end point of the arc, return clone of the arc. If point does not belong to the arcs, return
+   * empty array.
+   * @param pt Query point
+   * @returns {Arc[]}
+   */
+  split(pt: Point): Arc[] {
+    if (this.start.equalTo(pt)) return [this.clone()]
 
-  //   if (this.end.equalTo(pt)) return [this.clone(), null]
+    if (this.end.equalTo(pt)) return [this.clone()]
 
-  //   const angle = new Vector(this.pc, pt).slope
+    const angle = new Vector(this.pc, pt).slope
 
-  //   return [
-  //     new Arc(this.pc, this.r, this.startAngle, angle, this.counterClockwise),
-  //     new Arc(this.pc, this.r, angle, this.endAngle, this.counterClockwise)
-  //   ]
-  // }
+    return [
+      new Arc(this.pc, this.r, this.startAngle, angle, this.counterClockwise),
+      new Arc(this.pc, this.r, angle, this.endAngle, this.counterClockwise)
+    ]
+  }
 
   /**
    * Get middle point of the arc
@@ -269,18 +270,18 @@ export class Arc extends Shape<Arc> {
     if (shape instanceof Line) {
       return Intersection.intersectLine2Arc(shape, this)
     }
-    // if (shape instanceof Ray) {
-    //   return Intersection.intersectRay2Arc(shape, this)
-    // }
+    if (shape instanceof Ray) {
+      return Intersection.intersectRay2Arc(shape, this)
+    }
     if (shape instanceof Circle) {
       return Intersection.intersectArc2Circle(this, shape)
     }
     if (shape instanceof Segment) {
       return Intersection.intersectSegment2Arc(shape, this)
     }
-    // if (shape instanceof Box) {
-    //   return Intersection.intersectArc2Box(this, shape)
-    // }
+    if (shape instanceof Box) {
+      return Intersection.intersectArc2Box(this, shape)
+    }
     if (shape instanceof Arc) {
       return Intersection.intersectArc2Arc(this, shape)
     }

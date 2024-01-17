@@ -10,6 +10,7 @@ export { Vector, vector } from './classes/vector'
 export { Arc, arc } from './classes/arc'
 export { Circle, circle } from './classes/circle'
 export { Inversion } from './classes/inversion'
+export { Ray, ray } from './classes/ray'
 
 export { Config } from './utils/config'
 

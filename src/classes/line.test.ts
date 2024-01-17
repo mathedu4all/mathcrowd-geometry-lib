@@ -9,7 +9,9 @@ import {
   point,
   vector,
   Circle,
-  Arc
+  Arc,
+  ray,
+  Ray
 } from '../index'
 import { CCW } from '../utils/constants'
 
@@ -63,15 +65,15 @@ describe('Line', function () {
     const line = new Line(pt1, pt2)
     expect(line.contains(pt3)).toBe(true)
   })
-  // it('May split line by point into array of two rays', function () {
-  //   const pt = point(100, 200)
-  //   const norm = vector(0, 1)
-  //   const l = line(pt, norm)
-  //   const split_pt = point(300, 200)
-  //   const res = l.split(split_pt)
-  //   expect(res[0]).toEqual(ray(split_pt, norm.invert()))
-  //   expect(res[1]).toEqual(ray(split_pt, norm))
-  // })
+  it('May split line by point into array of two rays', function () {
+    const pt = point(100, 200)
+    const norm = vector(0, 1)
+    const l = line(pt, norm)
+    const splitPt = point(300, 200)
+    const res = l.split(splitPt) as [Ray, Ray]
+    expect(res[0]).toEqual(ray(splitPt, norm.invert()))
+    expect(res[1]).toEqual(ray(splitPt, norm))
+  })
   it('May return 1-dim coordinate of point on line', function () {
     const pt = point(100, 200)
     const norm = vector(0, 1)

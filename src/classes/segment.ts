@@ -10,6 +10,7 @@ import { EQ_0 } from '../utils/utils'
 import { Errors } from '../utils/errors'
 import { Circle } from './circle'
 import { Arc } from './arc'
+import { Ray } from './ray'
 
 /**
  * Class representing a segment
@@ -164,9 +165,9 @@ export class Segment extends Shape<Segment> {
       return Intersection.intersectSegment2Line(this, shape)
     }
 
-    // if (shape instanceof Ray) {
-    //   return Intersection.intersectRay2Segment(shape, this)
-    // }
+    if (shape instanceof Ray) {
+      return Intersection.intersectRay2Segment(shape, this)
+    }
 
     if (shape instanceof Segment) {
       return Intersection.intersectSegment2Segment(this, shape)
@@ -176,9 +177,9 @@ export class Segment extends Shape<Segment> {
       return Intersection.intersectSegment2Circle(this, shape)
     }
 
-    // if (shape instanceof Box) {
-    //   return Intersection.intersectSegment2Box(this, shape)
-    // }
+    if (shape instanceof Box) {
+      return Intersection.intersectSegment2Box(this, shape)
+    }
 
     if (shape instanceof Arc) {
       return Intersection.intersectSegment2Arc(this, shape)
@@ -255,20 +256,22 @@ export class Segment extends Shape<Segment> {
     return new Segment(this.end, this.start)
   }
 
-  // /**
-  //  * When point belongs to segment, return array of two segments split by given point,
-  //  * if point is inside segment. Returns clone of this segment if query point is incident
-  //  * to start or end point of the segment. Returns empty array if point does not belong to segment
-  //  * @param {Point} pt Query point
-  //  * @returns {Segment[]}
-  //  */
-  // split(pt) {
-  //   if (this.start.equalTo(pt)) return [null, this.clone()]
+  /**
+   * When point belongs to segment, return array of two segments split by given point,
+   * if point is inside segment. Returns clone of this segment if query point is incident
+   * to start or end point of the segment. Returns empty array if point does not belong to segment
+   * @param {} pt Query point
+   * @returns {Segment[]}
+   */
+  split(pt: Point): [Segment, Segment] | [Segment] | [] {
+    if (!this.contains(pt)) return []
 
-  //   if (this.end.equalTo(pt)) return [this.clone(), null]
+    if (this.start.equalTo(pt)) return [this.clone()]
 
-  //   return [new Segment(this.start, pt), new Segment(pt, this.end)]
-  // }
+    if (this.end.equalTo(pt)) return [this.clone()]
+
+    return [new Segment(this.start, pt), new Segment(pt, this.end)]
+  }
 
   /**
    * Get middle point
