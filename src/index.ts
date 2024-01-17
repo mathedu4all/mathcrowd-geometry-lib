@@ -9,6 +9,8 @@ export { Point, point } from './classes/point'
 export { Vector, vector } from './classes/vector'
 export { Arc, arc } from './classes/arc'
 export { Circle, circle } from './classes/circle'
+export { Inversion } from './classes/inversion'
+
 export { Config } from './utils/config'
 
 export * as Constants from './utils/constants'
