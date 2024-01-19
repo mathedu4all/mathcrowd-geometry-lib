@@ -29,8 +29,14 @@
   ],
   "root": true,
   "rules": {
-    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
-    "camelcase":"error"
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "camelcase": "error"
   },
   "settings": {
     "import/resolver": {

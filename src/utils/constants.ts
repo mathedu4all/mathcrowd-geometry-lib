@@ -31,3 +31,6 @@ export const OVERLAP_OPPOSITE = 2
 export const NOT_VERTEX = 0
 export const START_VERTEX = 1
 export const END_VERTEX = 2
+
+export const RB_TREE_COLOR_RED = 0
+export const RB_TREE_COLOR_BLACK = 1
