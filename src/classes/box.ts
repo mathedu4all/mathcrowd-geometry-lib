@@ -175,8 +175,8 @@ export class Box extends Shape<Box> {
     return this.low.equalTo(otherBox.low) && this.high.equalTo(otherBox.high)
   }
 
-  output(): Box {
-    return this.clone()
+  output(): [Point, Point] {
+    return [this.low, this.high]
   }
 
   static comparableMax(box1: Box, box2: Box) {

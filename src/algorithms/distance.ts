@@ -1,11 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Point } from '../classes/point'
 import { Line, line } from '../classes/line'
 import { Segment } from '../classes/segment'
 import { Vector } from '../classes/vector'
-import { EQ_0, GE, GT, LT } from '../utils/utils'
+import { EQ_0, GE, GT, LE, LT } from '../utils/utils'
 import * as Intersection from '../algorithms/intersection'
 import { Circle } from '../classes/circle'
 import { Arc } from '../classes/arc'
+import { IntervalTree, Node } from './structures/intervalTree'
+import { PlanarSet } from './structures/planarSet'
+// import { Shape } from '../classes/shape'
+// import { Edge } from '../classes/edge'
+// import { Polygon } from '../classes/polygon'
+import { Box } from '../classes/box'
 
 export class Distance {
   /**
@@ -467,168 +474,187 @@ export class Distance {
   //     return min_distanceAndSegment
   //   }
 
-  //   /**
-  //    * Returns [mindist, maxdist] array of squared minimal and maximal distance between boxes
-  //    * Minimal distance by x is
-  //    *    (box2.xmin - box1.xmax), if box1 is left to box2
-  //    *    (box1.xmin - box2.xmax), if box2 is left to box1
-  //    *    0,                       if box1 and box2 are intersected by x
-  //    * Minimal distance by y is defined in the same way
-  //    *
-  //    * Maximal distance is estimated as a sum of squared dimensions of the merged box
-  //    *
-  //    * @param box1
-  //    * @param box2
-  //    * @returns {Number | Number} - minimal and maximal distance
-  //    */
-  //   static box2box_minmax(box1, box2) {
-  //     const mindist_x = Math.max(
-  //       Math.max(box1.xmin - box2.xmax, 0),
-  //       Math.max(box2.xmin - box1.xmax, 0)
-  //     )
-  //     const mindist_y = Math.max(
-  //       Math.max(box1.ymin - box2.ymax, 0),
-  //       Math.max(box2.ymin - box1.ymax, 0)
-  //     )
-  //     const mindist = mindist_x * mindist_x + mindist_y * mindist_y
+  /**
+   * Returns [mindist, maxdist] array of *squared* minimal and maximal distance between boxes
+   * Minimal distance by x is
+   *    (box2.xmin - box1.xmax), if box1 is left to box2
+   *    (box1.xmin - box2.xmax), if box2 is left to box1
+   *    0,                       if box1 and box2 are intersected by x
+   * Minimal distance by y is defined in the same way
+   *
+   * Maximal distance is estimated as a sum of squared dimensions of the merged box
+   *
+   * @param box1
+   * @param box2
+   * @returns [minDist, maxDist]
+   */
+  static box2boxMinMax(box1: Box, box2: Box): [number, number] {
+    const minDistX = Math.max(
+      Math.max(box1.xmin - box2.xmax, 0),
+      Math.max(box2.xmin - box1.xmax, 0)
+    )
+    const minDistY = Math.max(
+      Math.max(box1.ymin - box2.ymax, 0),
+      Math.max(box2.ymin - box1.ymax, 0)
+    )
+    const minDist = minDistX * minDistX + minDistY * minDistY
 
-  //     const box = box1.merge(box2)
-  //     const dx = box.xmax - box.xmin
-  //     const dy = box.ymax - box.ymin
-  //     const maxdist = dx * dx + dy * dy
+    const mergedBox = box1.merge(box2)
+    const dx = mergedBox.xmax - mergedBox.xmin
+    const dy = mergedBox.ymax - mergedBox.ymin
+    const maxDist = dx * dx + dy * dy
 
-  //     return [mindist, maxdist]
-  //   }
+    return [minDist, maxDist]
+  }
 
-  //   static minmax_tree_process_level(shape, level, min_stop, tree) {
-  //     // Calculate minmax distance to each shape in current level
-  //     // Insert result into the interval tree for further processing
-  //     // update min_stop with maxdist, it will be the new stop distance
-  //     let mindist, maxdist
-  //     for (const node of level) {
-  //       // [mindist, maxdist] = Distance.box2box_minmax(shape.box, node.max);
-  //       // if (GT(mindist, min_stop))
-  //       //     continue;
+  /**
+   * Calculate estimated minimal and maxium distance between the shape and node in PlanarSet using box level by level.
+   * The minimum maxDistance is updated, nodes with minDist larger than minMax will be skipped.
+   * the estimated [minDist, maxDist] pair is inserted into the interval tree.
+   *
+   * @param shape - represents the current query shape
+   * @param level - the array of nodes at the current level of the interval tree
+   * @param minStop - the current minimum stop distance
+   * @param tree - the interval tree used to store the calculation results.
+   * @returns the updated minimum stop distance.
+   */
+  static minMaxTreeProcessLevel(
+    shape: Segment | Arc | Circle | Line | Point,
+    level: Node[],
+    minStop: number,
+    tree: IntervalTree
+  ): number {
+    let minDist, maxDist
 
-  //       // Estimate min-max dist to the shape stored in the node.item, using node.item.key which is shape's box
-  //       ;[mindist, maxdist] = Distance.box2box_minmax(shape.box, node.item.key)
-  //       if (node.item.value instanceof Edge) {
-  //         tree.insert([mindist, maxdist], node.item.value.shape)
-  //       } else {
-  //         tree.insert([mindist, maxdist], node.item.value)
-  //       }
-  //       if (LT(maxdist, min_stop)) {
-  //         min_stop = maxdist // this will be the new distance estimation
-  //       }
-  //     }
+    for (const node of level) {
+      ;[minDist, maxDist] = Distance.box2boxMinMax(shape.box, node.item.key)
 
-  //     if (level.length === 0) return min_stop
+      // if (node.item.value instanceof Edge) {
+      //   tree.insert([minDist, maxDist], node.item.value.shape)
+      // } else {
+      tree.insert([minDist, maxDist], node.item.value)
+      // }
 
-  //     // Calculate new level from left and right children of the current
-  //     const new_level_left = level
-  //       .map((node) => (node.left.isNil() ? undefined : node.left))
-  //       .filter((node) => node !== undefined)
-  //     const new_level_right = level
-  //       .map((node) => (node.right.isNil() ? undefined : node.right))
-  //       .filter((node) => node !== undefined)
-  //     // Merge left and right subtrees and leave only relevant subtrees
-  //     const new_level = [...new_level_left, ...new_level_right].filter((node) => {
-  //       // Node subtree quick reject, node.max is a subtree box
-  //       const [mindist, maxdist] = Distance.box2box_minmax(shape.box, node.max)
-  //       return LE(mindist, min_stop)
-  //     })
+      if (LT(maxDist, minStop)) {
+        minStop = maxDist // update minStop
+      }
+    }
 
-  //     min_stop = Distance.minmax_tree_process_level(
-  //       shape,
-  //       new_level,
-  //       min_stop,
-  //       tree
-  //     )
-  //     return min_stop
-  //   }
+    if (level.length === 0) return minStop
 
-  //   /**
-  //    * Calculates sorted tree of [mindist, maxdist] intervals between query shape
-  //    * and shapes of the planar set.
-  //    * @param shape
-  //    * @param set
-  //    */
-  //   static minmax_tree(shape, set, min_stop) {
-  //     const tree = new IntervalTree()
-  //     const level = [set.index.root]
-  //     let squared_min_stop =
-  //       min_stop < Number.POSITIVE_INFINITY
-  //         ? min_stop * min_stop
-  //         : Number.POSITIVE_INFINITY
-  //     squared_min_stop = Distance.minmax_tree_process_level(
-  //       shape,
-  //       level,
-  //       squared_min_stop,
-  //       tree
-  //     )
-  //     return tree
-  //   }
+    // get the next level nodes in PlanarSet
+    const newLevelLeft = level
+      .map((node) =>
+        node.left == null || node.left.isNil() ? undefined : node.left
+      )
+      .filter((node) => node !== undefined)
+    const newLevelRight = level
+      .map((node) =>
+        node.right == null || node.right.isNil() ? undefined : node.right
+      )
+      .filter((node) => node !== undefined)
 
-  //   static minmax_tree_calc_distance(shape, node, min_distanceAndSegment) {
-  //     let min_distanceAndSegment_new, stop
-  //     if (node != null && !node.isNil()) {
-  //       ;[min_distanceAndSegment_new, stop] = Distance.minmax_tree_calc_distance(
-  //         shape,
-  //         node.left,
-  //         min_distanceAndSegment
-  //       )
+    const newLevel = [...newLevelLeft, ...newLevelRight].filter((node) => {
+      const [minDist, _maxDist] = Distance.box2boxMinMax(shape.box, node!.max)
+      return LE(minDist, minStop)
+    }) as Node[]
 
-  //       if (stop) {
-  //         return [min_distanceAndSegment_new, stop]
-  //       }
+    minStop = Distance.minMaxTreeProcessLevel(shape, newLevel, minStop, tree)
+    return minStop
+  }
 
-  //       if (
-  //         LT(
-  //           min_distanceAndSegment_new[0],
-  //           Math.sqrt(node.item.key.low)
-  //         )
-  //       ) {
-  //         return [min_distanceAndSegment_new, true] // stop condition
-  //       }
+  /**
+   * This function initializes the interval tree and starts the process by calling minMaxTreeProcessLevel.
+   * It returns the resulting interval tree.
+   * @param shape
+   * @param set PlanarSet
+   * @param minStop
+   */
+  static minMaxTree(
+    shape: Segment | Arc | Circle | Line | Point,
+    set: PlanarSet,
+    minStop: number = Number.POSITIVE_INFINITY
+  ): IntervalTree {
+    const tree = new IntervalTree()
+    const level = [set.index.root!]
+    const squaredMinStop =
+      minStop < Number.POSITIVE_INFINITY
+        ? minStop * minStop
+        : Number.POSITIVE_INFINITY
+    Distance.minMaxTreeProcessLevel(shape, level, squaredMinStop, tree)
+    return tree
+  }
 
-  //       const [dist, shortestSegment] = Distance.distance(shape, node.item.value)
-  //       // console.log(dist)
-  //       if (LT(dist, min_distanceAndSegment_new[0])) {
-  //         min_distanceAndSegment_new = [dist, shortestSegment]
-  //       }
+  /**
+   *
+   * @param shape
+   * @param node
+   * @param minDistAndSegment
+   * @returns
+   */
+  static minMaxTreeCalcDistance(
+    shape: Segment | Arc | Circle | Line | Point,
+    node: Node | null,
+    minDistAndSegment: [number, Segment]
+  ): [[number, Segment], boolean] {
+    let minDistAndSegmentNew: [number, Segment], stop: boolean
 
-  //       ;[min_distanceAndSegment_new, stop] = Distance.minmax_tree_calc_distance(
-  //         shape,
-  //         node.right,
-  //         min_distanceAndSegment_new
-  //       )
+    if (node != null && !node.isNil()) {
+      ;[minDistAndSegmentNew, stop] = Distance.minMaxTreeCalcDistance(
+        shape,
+        node.left,
+        minDistAndSegment
+      )
 
-  //       return [min_distanceAndSegment_new, stop]
-  //     }
+      if (stop) {
+        return [minDistAndSegmentNew, stop]
+      }
 
-  //     return [min_distanceAndSegment, false]
-  //   }
+      if (LT(minDistAndSegmentNew[0], Math.sqrt(node.item.key.low))) {
+        return [minDistAndSegmentNew, true] // stop
+      }
 
-  //   /**
-  //    * Calculates distance between shape and Planar Set of shapes
-  //    * @param shape
-  //    * @param {PlanarSet} set
-  //    * @param {Number} min_stop
-  //    * @returns {*}
-  //    */
-  //   static shape2planarSet(shape, set, min_stop = Number.POSITIVE_INFINITY) {
-  //     let min_distanceAndSegment = [min_stop, new Segment()]
-  //     let stop = false
-  //     if (set instanceof PlanarSet) {
-  //       const tree = Distance.minmax_tree(shape, set, min_stop)
-  //       ;[min_distanceAndSegment, stop] = Distance.minmax_tree_calc_distance(
-  //         shape,
-  //         tree.root,
-  //         min_distanceAndSegment
-  //       )
-  //     }
-  //     return min_distanceAndSegment
-  //   }
+      const [dist, shortestSegment] = Distance.distance(shape, node.item.value)
+
+      if (LT(dist, minDistAndSegmentNew[0])) {
+        minDistAndSegmentNew = [dist, shortestSegment]
+      }
+
+      ;[minDistAndSegmentNew, stop] = Distance.minMaxTreeCalcDistance(
+        shape,
+        node.right,
+        minDistAndSegmentNew
+      )
+
+      return [minDistAndSegmentNew, stop]
+    }
+
+    return [minDistAndSegment, false]
+  }
+
+  /**
+   * Calculates distance between shape and Planar Set of shapes
+   * @param shape
+   * @param set
+   * @param minStop
+   * @returns {*}
+   */
+  static shape2planarSet(
+    shape: Segment | Arc | Circle | Line | Point,
+    set: PlanarSet,
+    minStop: number = Number.POSITIVE_INFINITY
+  ) {
+    let minDistAndSegment: [number, Segment] = [minStop, new Segment()]
+    if (set instanceof PlanarSet) {
+      const tree = Distance.minMaxTree(shape, set, minStop)
+      ;[minDistAndSegment] = Distance.minMaxTreeCalcDistance(
+        shape,
+        tree.root,
+        minDistAndSegment
+      )
+    }
+    return minDistAndSegment
+  }
 
   /**
    * Sort array of [distance, segment] pairs by distance
@@ -646,7 +672,10 @@ export class Distance {
     })
   }
 
-  //   static distance(shape1, shape2) {
-  //     return shape1.distanceTo(shape2)
-  //   }
+  static distance(
+    shape1: Arc | Circle | Line | Segment | Point,
+    shape2: Arc | Circle | Line | Segment | Point
+  ): [number, Segment] {
+    return shape1.distanceTo(shape2)
+  }
 }
