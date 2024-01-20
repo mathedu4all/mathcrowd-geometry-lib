@@ -4,10 +4,10 @@ import { LinkedList, LinkedListElement } from './linkedList'
  * Class implements circular bidirectional linked list
  * LinkedListElement - object of any type that has properties next and prev.
  */
-export class CircularLinkedList<T> extends LinkedList<T> {
+export class CircularLinkedList extends LinkedList {
   constructor(
-    first: LinkedListElement<T> | undefined,
-    last: LinkedListElement<T> | undefined
+    first: LinkedListElement | undefined = undefined,
+    last: LinkedListElement | undefined = undefined
   ) {
     super(first, last)
     this.setCircularLinks()
@@ -19,11 +19,11 @@ export class CircularLinkedList<T> extends LinkedList<T> {
     this.first!.prev = this.last!
   }
 
-  [Symbol.iterator](): Iterator<LinkedListElement<T>> {
-    let element: LinkedListElement<T> | undefined = undefined
+  [Symbol.iterator](): Iterator<LinkedListElement> {
+    let element: LinkedListElement | undefined = undefined
 
-    const iterator: Iterator<LinkedListElement<T>> = {
-      next: (): IteratorResult<LinkedListElement<T>> => {
+    const iterator: Iterator<LinkedListElement> = {
+      next: (): IteratorResult<LinkedListElement> => {
         const value = element ? element : this.first!
         const done = this.first
           ? element
@@ -40,10 +40,10 @@ export class CircularLinkedList<T> extends LinkedList<T> {
 
   /**
    * Append new element to the end of the list
-   * @param {LinkedList<T>} element - new element to be appended
-   * @returns {CircularLinkedList<T>}
+   * @param {LinkedList} element - new element to be appended
+   * @returns {CircularLinkedList}
    */
-  append(element: LinkedListElement<T>): CircularLinkedList<T> {
+  append(element: LinkedListElement): CircularLinkedList {
     super.append(element)
     this.setCircularLinks()
     return this
@@ -51,14 +51,14 @@ export class CircularLinkedList<T> extends LinkedList<T> {
 
   /**
    * Insert new element to the list after elementBefore
-   * @param {LinkedList<T>} newElement - new element to be inserted
-   * @param {LinkedList<T>} elementBefore - element in the list to insert after it
-   * @returns {CircularLinkedList<T>}
+   * @param {LinkedList} newElement - new element to be inserted
+   * @param {LinkedList} elementBefore - element in the list to insert after it
+   * @returns {CircularLinkedList}
    */
   insert(
-    newElement: LinkedListElement<T>,
-    elementBefore?: LinkedListElement<T>
-  ): CircularLinkedList<T> {
+    newElement: LinkedListElement,
+    elementBefore?: LinkedListElement
+  ): CircularLinkedList {
     super.insert(newElement, elementBefore)
     this.setCircularLinks()
     return this
@@ -66,10 +66,10 @@ export class CircularLinkedList<T> extends LinkedList<T> {
 
   /**
    * Remove element from the list
-   * @param {LinkedList<T>} element - element to be removed from the list
-   * @returns {CircularLinkedList<T>}
+   * @param {LinkedList} element - element to be removed from the list
+   * @returns {CircularLinkedList}
    */
-  remove(element: LinkedListElement<T>): CircularLinkedList<T> {
+  remove(element: LinkedListElement): CircularLinkedList {
     super.remove(element)
     this.setCircularLinks()
     return this

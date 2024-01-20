@@ -4,25 +4,25 @@ import { Errors } from '../../utils/errors'
  * Class implements bidirectional non-circular linked list. <br/>
  * LinkedListElement - object of any type that has properties next and prev.
  */
-export class LinkedList<T> {
-  first: LinkedListElement<T> | undefined
-  last: LinkedListElement<T> | undefined
+export class LinkedList {
+  first: LinkedListElement | undefined
+  last: LinkedListElement | undefined
 
   /**
    *
    * @param first - First element of the list
    * @param last - Last element of the list
    */
-  constructor(first?: LinkedListElement<T>, last?: LinkedListElement<T>) {
+  constructor(first?: LinkedListElement, last?: LinkedListElement) {
     this.first = first
     this.last = last || this.first
   }
 
-  [Symbol.iterator](): Iterator<LinkedListElement<T>> {
-    let value: LinkedListElement<T> | undefined = undefined
+  [Symbol.iterator](): Iterator<LinkedListElement> {
+    let value: LinkedListElement | undefined = undefined
 
-    const iterator: Iterator<LinkedListElement<T>> = {
-      next: (): IteratorResult<LinkedListElement<T>> => {
+    const iterator: Iterator<LinkedListElement> = {
+      next: (): IteratorResult<LinkedListElement> => {
         // If there is already a value, take the next element, otherwise start from the first element of the linked list
         value = value ? value.next : this.first
 
@@ -54,13 +54,13 @@ export class LinkedList<T> {
    * @returns {LinkedListElement[]} Array containing elements
    */
   toArray(
-    start?: LinkedListElement<T>,
-    end?: LinkedListElement<T>
-  ): LinkedListElement<T>[] {
-    const elements: LinkedListElement<T>[] = []
+    start?: LinkedListElement,
+    end?: LinkedListElement
+  ): LinkedListElement[] {
+    const elements: LinkedListElement[] = []
     const from = start || this.first
     const to = end || this.last
-    let element: LinkedListElement<T> | undefined = from
+    let element: LinkedListElement | undefined = from
 
     // If the starting position is undefined, return an empty array
     if (element === undefined) return elements
@@ -79,7 +79,7 @@ export class LinkedList<T> {
    * @param {LinkedListElement} element
    * @returns {LinkedList}
    */
-  append(element: LinkedListElement<T>): LinkedList<T> {
+  append(element: LinkedListElement): LinkedList {
     if (this.isEmpty()) {
       this.first = element
     } else {
@@ -103,9 +103,9 @@ export class LinkedList<T> {
    * @returns {LinkedList}
    */
   insert(
-    newElement: LinkedListElement<T>,
-    elementBefore?: LinkedListElement<T>
-  ): LinkedList<T> {
+    newElement: LinkedListElement,
+    elementBefore?: LinkedListElement
+  ): LinkedList {
     if (this.isEmpty()) {
       this.first = newElement
       this.last = newElement
@@ -137,7 +137,7 @@ export class LinkedList<T> {
    * @param {LinkedListElement} element
    * @returns {LinkedList}
    */
-  remove(element: LinkedListElement<T>): LinkedList<T> {
+  remove(element: LinkedListElement): LinkedList {
     // Special case if the last edge is removed
     if (element === this.first && element === this.last) {
       this.first = undefined
@@ -171,9 +171,9 @@ export class LinkedList<T> {
    * @param {LinkedListElement} first - Element to start iteration
    * @throws {Errors.INFINITE_LOOP}
    */
-  static testInfiniteLoop<T>(first: LinkedListElement<T>): void {
-    let edge: LinkedListElement<T> | undefined = first
-    let controlEdge: LinkedListElement<T> | undefined = first
+  static testInfiniteLoop(first: LinkedListElement): void {
+    let edge: LinkedListElement | undefined = first
+    let controlEdge: LinkedListElement | undefined = first
     do {
       if (edge !== first && edge === controlEdge) {
         throw Errors.INFINITE_LOOP
@@ -182,13 +182,32 @@ export class LinkedList<T> {
       controlEdge = controlEdge!.next!.next
     } while (edge !== first)
   }
+
+  /**
+   * Reverse the linked list
+   * @returns
+   */
+  reverse(): LinkedList {
+    let element: LinkedListElement | undefined = this.first
+
+    while (element) {
+      const next = element.next
+      element.next = element.prev
+      element.prev = next
+      element = next
+      if (element === this.first) break
+    }
+    const first = this.first
+    this.first = this.last
+    this.last = first
+    return this
+  }
 }
 
 /**
  * Class implements bidirectional non-circular linked list element
  */
-export interface LinkedListElement<T> {
-  prev: LinkedListElement<T> | undefined
-  next: LinkedListElement<T> | undefined
-  val: T
+export interface LinkedListElement {
+  prev: LinkedListElement | undefined
+  next: LinkedListElement | undefined
 }
