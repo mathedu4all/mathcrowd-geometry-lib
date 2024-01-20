@@ -44,11 +44,11 @@ export class Arc extends Shape<Arc> {
   /**
    *
    * @param args Arc may be constructed [pc, r, startAngle, endAngle, counterClockWise].
-   * @param {Point} pc - arc center
-   * @param {number} r - arc radius
-   * @param {number} startAngle - start angle in radians from 0 to 2*PI
-   * @param {number} endAngle - end angle in radians from 0 to 2*PI
-   * @param {boolean} counterClockwise - arc direction, true - clockwise, false - counterclockwise
+   * pc - arc center
+   * r - arc radius
+   * startAngle - start angle in radians from 0 to 2*PI
+   * endAngle - end angle in radians from 0 to 2*PI
+   * counterClockwise - arc direction, true - clockwise, false - counterclockwise
    */
   constructor(
     ...args:
@@ -263,7 +263,7 @@ export class Arc extends Shape<Arc> {
 
   /**
    * Get array of intersection points between arc and other shape
-   * @param Shape of the one of supported types <br/>
+   * @param shape Shape of the one of supported types <br/>
    * @returns array of intersection points between arc and other shape
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -234,8 +234,8 @@ export class Box extends Shape<Box> {
   /**
    * Box rotation is not supported
    * Attempt to rotate box throws error
-   * @param angle in radians
-   * @param center
+   * @param _angle in radians
+   * @param _center
    */
   rotate(_angle: number, _center: Point): Box {
     throw Errors.OPERATION_IS_NOT_SUPPORTED

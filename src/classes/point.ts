@@ -86,7 +86,7 @@ export class Point extends Shape<Point> implements SimplePoint {
   }
 
   /**
-   * Returns true if points are equal up to [DP_TOL]{@link DP_TOL} tolerance
+   * Returns true if points are equal up to [DP_TOL]{@link Config} tolerance
    * @param pt Query point
    * @returns
    */
@@ -97,7 +97,7 @@ export class Point extends Shape<Point> implements SimplePoint {
   /**
    * Defines predicate "less than" between points. Returns true if the point is less than query points, false otherwise <br/>
    * By definition point1 < point2 if {point1.y < point2.y || point1.y == point2.y && point1.x < point2.x <br/>
-   * Numeric values compared with [DP_TOL]{@link DP_TOL} tolerance
+   * Numeric values compared with [DP_TOL]{@link Config} tolerance
    * @param pt Query point
    * @returns
    */

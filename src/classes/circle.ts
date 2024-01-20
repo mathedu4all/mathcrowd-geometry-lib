@@ -27,9 +27,7 @@ export class Circle extends Shape<Circle> {
   r: number = 1
 
   /**
-   * @param args Arc may be constructed [pc, r].
-   * @param {Point} pc - circle center point
-   * @param {number} r - circle radius
+   * @param args Arc may be constructed [pc, r] or [pc] or [r]
    */
   constructor(...args: [Point, number] | [Point] | [number]) {
     super()

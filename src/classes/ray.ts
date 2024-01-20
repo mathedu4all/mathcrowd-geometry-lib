@@ -10,6 +10,7 @@ import { Line } from './line'
 import { Circle } from './circle'
 import { Matrix } from './matrix'
 import { EQ_0, GE } from '../utils/utils'
+import { Polygon } from './polygon'
 
 /**
  * Class representing a ray (a half-infinite line).
@@ -151,11 +152,11 @@ export class Ray extends Shape<Ray> {
 
   /**
    * Returns array of intersection points between ray and another shape
-   * @param {Shape} shape - Shape to intersect with ray
-   * @returns {Point[]} array of intersection points
+   * @param shape - Shape to intersect with ray
+   * @returns array of intersection points
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  intersect(shape: Shape<any>) {
+  intersect(shape: Shape<any>): Point[] {
     if (shape instanceof Point) {
       return this.contains(shape) ? [shape] : []
     }
@@ -184,9 +185,9 @@ export class Ray extends Shape<Ray> {
       return Intersection.intersectRay2Box(this, shape)
     }
 
-    // if (shape instanceof Polygon) {
-    //   return Intersection.intersectRay2Polygon(this, shape)
-    // }
+    if (shape instanceof Polygon) {
+      return Intersection.intersectRay2Polygon(this, shape)
+    }
 
     throw Errors.OPERATION_IS_NOT_SUPPORTED
   }

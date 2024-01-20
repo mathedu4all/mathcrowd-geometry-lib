@@ -332,7 +332,7 @@ export class Segment extends Shape<Segment> {
 
   /**
    * Sort given array of points from segment start to end, assuming all points lay on the segment
-   * @param array of points
+   * @param pts array of points
    * @returns  new array sorted
    */
   sortPoints(pts: Point[]): Point[] {

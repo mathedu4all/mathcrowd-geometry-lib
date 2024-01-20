@@ -1,4 +1,5 @@
-import { Distance } from '../algorithms/distance'
+import { Distance } from '../algorithms'
+import { PlanarSet } from '../algorithms/structures'
 import {
   matrix,
   Point,
@@ -8,7 +9,6 @@ import {
   Arc,
   Box,
   Polygon,
-  PlanarSet,
   point,
   vector,
   circle,

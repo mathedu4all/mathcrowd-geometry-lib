@@ -1,8 +1,6 @@
 import * as Intersection from '../algorithms/intersection'
 
 import { Multiline } from './multiline'
-import { intersectEdge2Line } from '../algorithms/intersection'
-import { INSIDE, BOUNDARY } from '../utils/constants'
 import { Matrix } from './matrix'
 import { Face } from './face'
 import { Point } from './point'
@@ -46,7 +44,7 @@ export class Polygon extends Shape<Polygon> {
    * - array of numeric pairs which represent points <br/>
    * - box or circle object <br/>
    * Alternatively, it is possible to use polygon.addFace method
-   * @param {args} - array of shapes or array of arrays
+   * @param args array of shapes or array of arrays
    */
   constructor(
     ...args:
@@ -304,14 +302,14 @@ export class Polygon extends Shape<Polygon> {
   }
 
   /**
+   * TODO:
    * Returns true if polygon contains shape: no point of shape lay outside of the polygon,
    * false otherwise
-   * @param shape - test shape
+   * @param _shape - test shape
    * @returns
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   contains(_shape: Shape<any>): boolean {
-    // TODO
     return false
   }
 

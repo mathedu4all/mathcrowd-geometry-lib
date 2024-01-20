@@ -16,9 +16,9 @@ export { Face } from './classes/face'
 export { Edge } from './classes/edge'
 export { Multiline, multiline } from './classes/multiline'
 
-export { CircularLinkedList } from './algorithms/structures/circularLinkedList'
-export { LinkedList } from './algorithms/structures/linkedList'
-export { PlanarSet } from './algorithms/structures/planarSet'
+export * as Types from './classes/types'
+export * as Structures from './algorithms/structures'
+export * as Algorithms from './algorithms'
 
 export { Config } from './utils/config'
 

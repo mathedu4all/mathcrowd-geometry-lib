@@ -12,7 +12,6 @@ import { Circle } from './circle'
 import { Arc } from './arc'
 import { Ray } from './ray'
 import { Polygon } from './polygon'
-import { Multiline } from './multiline'
 /**
  * Class representing a line
  * @type {Line}
@@ -282,7 +281,7 @@ export class Line extends Shape<Line> {
    * Split line with a point or array of points and return array of shapes
    * Assumed (but not checked) that all points lay on the line
    * @param  pt
-   * @returns {MultilineShapes}
+   * @returns
    */
   split(pt: Point): (Ray | Segment | Ray)[] {
     return [new Ray(pt, this.norm.invert()), new Ray(pt, this.norm)]

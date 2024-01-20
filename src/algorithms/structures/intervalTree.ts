@@ -530,8 +530,6 @@ export class IntervalTree {
 
   /**
    * Recolor nodes and perform rotations to preserve red-black tree properties after delete.
-   * @param u
-   * @param v
    */
   treeDeleteFixup(fixupNode: Node): void {
     let currentNode = fixupNode
@@ -754,7 +752,7 @@ export class IntervalTree {
 
   /**
    * Returns number of items stored in the interval tree
-   * @returns {number}
+   * @returns
    */
   get size(): number {
     let count = 0
@@ -764,7 +762,7 @@ export class IntervalTree {
 
   /**
    * Returns array of sorted keys in the ascending order
-   * @returns {Array}
+   * @returns
    */
   get keys(): any[] {
     const res: any[] = []
@@ -776,7 +774,7 @@ export class IntervalTree {
 
   /**
    * Return array of values in the ascending keys order
-   * @returns {Array}
+   * @returns
    */
   get values(): any[] {
     const res: any[] = []
@@ -786,7 +784,7 @@ export class IntervalTree {
 
   /**
    * Returns array of items (<key,value> pairs) in the ascended keys order
-   * @returns {Array}
+   * @returns
    */
   get items(): any[] {
     const res: any[] = []
@@ -818,7 +816,7 @@ export class IntervalTree {
    * Insert new item into interval tree
    * @param key - interval object or array of two numbers [low, high]
    * @param value - value representing any object (optional)
-   * @returns {Node} returns reference to inserted node as an object {key:NumberInterval, value: value}
+   * @returns returns reference to inserted node as an object {key:NumberInterval, value: value}
    */
   insert(key: Interval | [number, number], value: any = key): Node | null {
     if (key === undefined) return null
@@ -837,9 +835,9 @@ export class IntervalTree {
 
   /**
    * Returns true if item {key,value} exist in the tree
-   * @param {NumberInterval} key - interval correspondent to keys stored in the tree
-   * @param {any} value - value object to be checked
-   * @returns {boolean} true if item {key, value} exist in the tree, false otherwise
+   * @param key - interval correspondent to keys stored in the tree
+   * @param value - value object to be checked
+   * @returns true if item {key, value} exist in the tree, false otherwise
    */
   exist(key: any, value: any = key): boolean {
     const searchNode = new Node(key, value)
@@ -848,9 +846,9 @@ export class IntervalTree {
 
   /**
    * Remove entry {key, value} from the tree
-   * @param {NumberInterval} key - interval correspondent to keys stored in the tree
-   * @param {any} value - value object
-   * @returns {boolean} true if item {key, value} deleted, false if not found
+   * @param key - interval correspondent to keys stored in the tree
+   * @param value - value object
+   * @returns deleted node or null if node not found
    */
   remove(key: any, value: any = key): Node | null {
     const searchNode = new Node(key, value)
@@ -864,8 +862,8 @@ export class IntervalTree {
   /**
    * Returns array of entry values which keys intersect with given interval <br/>
    * If no values stored in the tree, returns array of keys which intersect given interval
-   * @param {NumberInterval} interval - search interval, or tuple [low, high]
-   * @param outputMapperFn(value,key) - optional function that maps (value, key) to custom output
+   * @param interval - search interval, or tuple [low, high]
+   * @param outputMapperFn - optional function that maps (value, key) to custom output
    * @returns {Array}
    */
   search(
@@ -883,8 +881,8 @@ export class IntervalTree {
 
   /**
    * Returns true if intersection between given and any interval stored in the tree found
-   * @param {NumberInterval} interval - search interval or tuple [low, high]
-   * @returns {boolean}
+   * @param interval - search interval or tuple [low, high]
+   * @returns
    */
   intersectAny(interval: any): boolean {
     const searchNode = new Node(interval)
@@ -895,9 +893,9 @@ export class IntervalTree {
   /**
    * Tree visitor. For each node implement a callback function. <br/>
    * Method calls a callback function with two parameters (key, value)
-   * @param visitor(key,value) - function to be called for each tree item
+   * @param visitor function to be called for each tree item
    */
-  forEach(visitor: Function): void {
+  forEach(visitor: (key: any, value: any) => {}): void {
     this.treeWalk(this.root, (node: Node) =>
       visitor(node.item.key, node.item.value)
     )
@@ -905,7 +903,7 @@ export class IntervalTree {
 
   /**
    * Value Mapper. Walk through every node and map node value to another value
-   * @param callback(value,key) - function to be called for each tree item
+   * @param callback function to be called for each tree item
    */
   map(callback: (value: any, key: any) => {}): IntervalTree {
     const tree = new IntervalTree()

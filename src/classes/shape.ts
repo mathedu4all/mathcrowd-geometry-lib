@@ -70,7 +70,7 @@ export class Shape<T extends Shape<T>> {
 
   /**
    * Transform shape with given affine transformation matrix.
-   * @param matrix
+   * @param _matrix
    * @returns new transformed shape
    */
   transform(_matrix: Matrix): T {
@@ -79,7 +79,7 @@ export class Shape<T extends Shape<T>> {
 
   /**
    * Get distance to shape.
-   * @param shape
+   * @param _shape
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   distanceTo(_shape: Shape<any>): [number, Segment] {
