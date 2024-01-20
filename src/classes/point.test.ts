@@ -181,28 +181,28 @@ describe('Point.On inclusion queries', function () {
     expect(pt.on(arc)).toBe(true)
   })
 
-  // it('Method "on" returns true if point belong to polygon', function () {
-  //   const points = [
-  //     point(100, 20),
-  //     point(250, 75),
-  //     point(350, 75),
-  //     point(300, 270),
-  //     point(170, 200),
-  //     point(120, 350),
-  //     point(70, 120)
-  //   ]
-  //   const poly = new Polygon()
-  //   poly.addFace(points)
-  //   poly.addFace([circle(point(175, 150), 30).toArc()])
-  //   const pt1 = point(300, 50)
-  //   const pt2 = point(50, 75)
-  //   const pt3 = point(180, 160)
-  //   const pt4 = point(140, 250)
-  //   expect(pt1.on(poly)).toBe(false)
-  //   expect(pt2.on(poly)).toBe(false)
-  //   expect(pt3.on(poly)).toBe(false)
-  //   expect(pt4.on(poly)).toBe(true)
-  // })
+  it('Method "on" returns true if point belong to polygon', function () {
+    const points = [
+      point(100, 20),
+      point(250, 75),
+      point(350, 75),
+      point(300, 270),
+      point(170, 200),
+      point(120, 350),
+      point(70, 120)
+    ]
+    const poly = new Polygon()
+    poly.addFace(points)
+    poly.addFace([circle(point(175, 150), 30).toArc()])
+    const pt1 = point(300, 50)
+    const pt2 = point(50, 75)
+    const pt3 = point(180, 160)
+    const pt4 = point(140, 250)
+    expect(pt1.on(poly)).toBe(false)
+    expect(pt2.on(poly)).toBe(false)
+    expect(pt3.on(poly)).toBe(false)
+    expect(pt4.on(poly)).toBe(true)
+  })
 
   it('Method leftTo returns true if point is on the "left" semi plane, which is the side of the normal vector', function () {
     const line = new Line(new Point(-1, -1), new Point(1, 1))

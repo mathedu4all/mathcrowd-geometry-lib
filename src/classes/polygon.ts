@@ -17,6 +17,8 @@ import { Line } from './line'
 import { LT } from '../utils/utils'
 import { Vector } from './vector'
 import { Ray } from './ray'
+import { rayShooting } from '../algorithms/rayShooting'
+import { BOUNDARY, INSIDE } from '../utils/constants'
 
 /**
  * Class representing a polygon.<br/>
@@ -264,18 +266,6 @@ export class Polygon extends Shape<Polygon> {
   }
 
   /**
-   * Cut polygon with multiline and return array of new polygons
-   * Multiline should be constructed from a line with intersection point, see notebook:
-   * https://next.observablehq.com/@alexbol99/cut-polygon-with-line
-   * @param multiline
-   * @returns
-   */
-  cut(multiline: Multiline): Polygon[] {
-    // TODO
-    return []
-  }
-
-  /**
    * Returns the first found edge of polygon that contains given point
    * If point is a vertex, return the edge where the point is an end vertex, not a start one
    * @param  pt
@@ -302,15 +292,18 @@ export class Polygon extends Shape<Polygon> {
   }
 
   /**
-   * TODO:
    * Returns true if polygon contains shape: no point of shape lay outside of the polygon,
    * false otherwise
-   * @param _shape - test shape
+   * @param shape - test shape
    * @returns
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contains(_shape: Shape<any>): boolean {
-    return false
+  contains(shape: Shape<any>): boolean {
+    if (shape instanceof Point) {
+      const rel = rayShooting(this, shape)
+      return rel === INSIDE || rel === BOUNDARY
+    }
+    throw Errors.OPERATION_IS_NOT_SUPPORTED
   }
 
   /**
