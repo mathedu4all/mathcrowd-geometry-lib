@@ -1,6 +1,5 @@
 import * as Intersection from '../algorithms/intersection'
 
-import { Multiline } from './multiline'
 import { Matrix } from './matrix'
 import { Face } from './face'
 import { Point } from './point'
