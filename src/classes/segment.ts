@@ -11,6 +11,8 @@ import { Errors } from '../utils/errors'
 import { Circle } from './circle'
 import { Arc } from './arc'
 import { Ray } from './ray'
+import { Polygon } from './polygon'
+import { PlanarSet } from '../algorithms/structures/planarSet'
 
 /**
  * Class representing a segment
@@ -185,9 +187,9 @@ export class Segment extends Shape<Segment> {
       return Intersection.intersectSegment2Arc(this, shape)
     }
 
-    // if (shape instanceof Polygon) {
-    //   return Intersection.intersectSegment2Polygon(this, shape)
-    // }
+    if (shape instanceof Polygon) {
+      return Intersection.intersectSegment2Polygon(this, shape)
+    }
 
     return []
   }
@@ -198,7 +200,7 @@ export class Segment extends Shape<Segment> {
    * @returns distance from segment to shape and shortest segment between segment and shape (started at segment, ended at shape)
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  distanceTo(shape: Shape<any>): [number, Segment] {
+  distanceTo(shape: Shape<any> | Polygon): [number, Segment] {
     if (shape instanceof Point) {
       const [dist, shortestSegment] = Distance.point2segment(shape, this)
       return [dist, shortestSegment.reverse()]
@@ -219,14 +221,15 @@ export class Segment extends Shape<Segment> {
       const [dist, shortestSegment] = Distance.segment2arc(this, shape)
       return [dist, shortestSegment]
     }
-    // if (shape instanceof Polygon) {
-    //   const [dist, shortestSegment] = Distance.shape2polygon(this, shape)
-    //   return [dist, shortestSegment]
-    // }
-    // if (shape instanceof PlanarSet) {
-    //   const [dist, shortestSegment] = Distance.shape2planarSet(this, shape)
-    //   return [dist, shortestSegment]
-    // }
+    if (shape instanceof Polygon) {
+      const [dist, shortestSegment] = Distance.shape2polygon(this, shape)
+      return [dist, shortestSegment]
+    }
+    if (shape instanceof PlanarSet) {
+      const [dist, shortestSegment] = Distance.shape2planarSet(this, shape)
+      return [dist, shortestSegment]
+    }
+
     throw Errors.OPERATION_IS_NOT_SUPPORTED
   }
 
@@ -260,15 +263,13 @@ export class Segment extends Shape<Segment> {
    * When point belongs to segment, return array of two segments split by given point,
    * if point is inside segment. Returns clone of this segment if query point is incident
    * to start or end point of the segment. Returns empty array if point does not belong to segment
-   * @param {} pt Query point
-   * @returns {Segment[]}
+   * @param pt Query point
+   * @returns
    */
   split(pt: Point): [Segment, Segment] | [Segment] | [] {
     if (!this.contains(pt)) return []
 
-    if (this.start.equalTo(pt)) return [this.clone()]
-
-    if (this.end.equalTo(pt)) return [this.clone()]
+    if (this.start.equalTo(pt) || this.end.equalTo(pt)) return [this.clone()]
 
     return [new Segment(this.start, pt), new Segment(pt, this.end)]
   }

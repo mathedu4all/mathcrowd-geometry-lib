@@ -3,7 +3,7 @@ import {
   Circle,
   Line,
   Segment,
-  // Polygon,
+  Polygon,
   point,
   vector,
   circle,
@@ -124,36 +124,36 @@ describe('Circle intersection with others.', function () {
     const ip = circle1.intersect(circle2)
     expect(ip.length).toBe(0)
   })
-  // it('Intersect circle with polygon', function () {
-  //   const points = [
-  //     point(100, 20),
-  //     point(250, 75),
-  //     point(350, 75),
-  //     point(300, 200),
-  //     point(170, 200),
-  //     point(120, 350),
-  //     point(70, 120)
-  //   ]
-  //   const polygon = new Polygon()
-  //   polygon.addFace(points)
-  //   const circle = new Circle(point(150, 50), 50)
-  //   expect(circle.intersect(polygon).length).toBe(2)
-  // })
-  // it('Intersect circle with box', function () {
-  //   const points = [
-  //     point(100, 20),
-  //     point(250, 75),
-  //     point(350, 75),
-  //     point(300, 200),
-  //     point(170, 200),
-  //     point(120, 350),
-  //     point(70, 120)
-  //   ]
-  //   const polygon = new Polygon()
-  //   polygon.addFace(points)
-  //   const circle = new Circle(point(150, 50), 50)
-  //   expect(circle.intersect(polygon.box).length).toBe(2)
-  // })
+  it('Intersect circle with polygon', function () {
+    const points = [
+      point(100, 20),
+      point(250, 75),
+      point(350, 75),
+      point(300, 200),
+      point(170, 200),
+      point(120, 350),
+      point(70, 120)
+    ]
+    const polygon = new Polygon()
+    polygon.addFace(points)
+    const circle = new Circle(point(150, 50), 50)
+    expect(circle.intersect(polygon).length).toBe(2)
+  })
+  it('Intersect circle with box', function () {
+    const points = [
+      point(100, 20),
+      point(250, 75),
+      point(350, 75),
+      point(300, 200),
+      point(170, 200),
+      point(120, 350),
+      point(70, 120)
+    ]
+    const polygon = new Polygon()
+    polygon.addFace(points)
+    const circle = new Circle(point(150, 50), 50)
+    expect(circle.intersect(polygon.box).length).toBe(2)
+  })
 })
 describe('Circle.DistanceTo', function () {
   it('Can measure distance between circle and point', function () {

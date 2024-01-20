@@ -9,6 +9,8 @@ import { Segment } from './segment'
 import { Line } from './line'
 import { LE } from '../utils/utils'
 import { Errors } from '../utils/errors'
+import { Polygon } from './polygon'
+import { PlanarSet } from '../algorithms/structures/planarSet'
 
 /**
  * Class representing a circle
@@ -163,16 +165,16 @@ export class Circle extends Shape<Circle> {
       return Intersection.intersectCircle2Circle(shape, this)
     }
 
-    // if (shape instanceof Box) {
-    //   return Intersection.intersectCircle2Box(this, shape)
-    // }
+    if (shape instanceof Box) {
+      return Intersection.intersectCircle2Box(this, shape)
+    }
 
     if (shape instanceof Arc) {
       return Intersection.intersectArc2Circle(shape, this)
     }
-    // if (shape instanceof Polygon) {
-    //   return Intersection.intersectCircle2Polygon(this, shape)
-    // }
+    if (shape instanceof Polygon) {
+      return Intersection.intersectCircle2Polygon(this, shape)
+    }
     throw Errors.OPERATION_IS_NOT_SUPPORTED
   }
 
@@ -182,7 +184,7 @@ export class Circle extends Shape<Circle> {
    * @returns distance from circle to shape and shortest segment between circle and shape (started at circle, ended at shape)
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  distanceTo(shape: Shape<any>): [number, Segment] {
+  distanceTo(shape: Shape<any> | Polygon): [number, Segment] {
     if (shape instanceof Point) {
       const [distance, shortestSegment] = Distance.point2circle(shape, this)
       return [distance, shortestSegment.reverse()]
@@ -208,15 +210,15 @@ export class Circle extends Shape<Circle> {
       return [distance, shortestSegment.reverse()]
     }
 
-    // if (shape instanceof Polygon) {
-    //   const [distance, shortestSegment] = Distance.shape2polygon(this, shape)
-    //   return [distance, shortestSegment]
-    // }
+    if (shape instanceof Polygon) {
+      const [distance, shortestSegment] = Distance.shape2polygon(this, shape)
+      return [distance, shortestSegment]
+    }
 
-    // if (shape instanceof PlanarSet) {
-    //   const [dist, shortestSegment] = Distance.shape2planarSet(this, shape)
-    //   return [dist, shortestSegment]
-    // }
+    if (shape instanceof PlanarSet) {
+      const [dist, shortestSegment] = Distance.shape2planarSet(this, shape)
+      return [dist, shortestSegment]
+    }
     throw Errors.OPERATION_IS_NOT_SUPPORTED
   }
 

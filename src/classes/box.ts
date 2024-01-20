@@ -8,6 +8,8 @@ import { Arc } from './arc'
 import { intersectSegment2Arc } from '../algorithms/intersection'
 import { Line } from './line'
 import { Ray } from './ray'
+import { Multiline } from './multiline'
+import { Polygon } from './polygon'
 
 /**
  * Class Box represents bounding box of the shape.
@@ -294,13 +296,13 @@ export class Box extends Shape<Box> {
       return false
     }
 
-    // if (shape instanceof Flatten.Multiline) {
-    //   return shape.toShapes().every((shape) => this.contains(shape))
-    // }
+    if (shape instanceof Multiline) {
+      return shape.toShapes().every((shape) => this.contains(shape))
+    }
 
-    // if (shape instanceof Flatten.Polygon) {
-    //   return this.contains(shape.box)
-    // }
+    if (shape instanceof Polygon) {
+      return this.contains(shape.box)
+    }
 
     throw Errors.OPERATION_IS_NOT_SUPPORTED
   }

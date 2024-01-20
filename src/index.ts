@@ -11,6 +11,14 @@ export { Arc, arc } from './classes/arc'
 export { Circle, circle } from './classes/circle'
 export { Inversion } from './classes/inversion'
 export { Ray, ray } from './classes/ray'
+export { Polygon, polygon } from './classes/polygon'
+export { Face } from './classes/face'
+export { Edge } from './classes/edge'
+export { Multiline, multiline } from './classes/multiline'
+
+export { CircularLinkedList } from './algorithms/structures/circularLinkedList'
+export { LinkedList } from './algorithms/structures/linkedList'
+export { PlanarSet } from './algorithms/structures/planarSet'
 
 export { Config } from './utils/config'
 

@@ -11,6 +11,8 @@ import { Segment } from './segment'
 import { Circle } from './circle'
 import { Arc } from './arc'
 import { Ray } from './ray'
+import { Polygon } from './polygon'
+import { Multiline } from './multiline'
 /**
  * Class representing a line
  * @type {Line}
@@ -235,9 +237,9 @@ export class Line extends Shape<Line> {
       return Intersection.intersectLine2Arc(this, shape)
     }
 
-    // if (shape instanceof Polygon) {
-    //   return Intersection.intersectLine2Polygon(this, shape)
-    // }
+    if (shape instanceof Polygon) {
+      return Intersection.intersectLine2Polygon(this, shape)
+    }
     return []
   }
 
@@ -247,7 +249,7 @@ export class Line extends Shape<Line> {
    * @returns {[number, Segment]}
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  distanceTo(shape: Shape<any>): [number, Segment] {
+  distanceTo(shape: Shape<any> | Polygon): [number, Segment] {
     if (shape instanceof Point) {
       const [distance, shortestSegment] = Distance.point2line(shape, this)
       return [distance, shortestSegment.reverse()]
@@ -268,10 +270,10 @@ export class Line extends Shape<Line> {
       return [distance, shortestSegment.reverse()]
     }
 
-    //   if (shape instanceof Polygon) {
-    //     const [distance, shortestSegment] = Distance.shape2polygon(this, shape)
-    //     return [distance, shortestSegment]
-    //   }
+    if (shape instanceof Polygon) {
+      const [distance, shortestSegment] = Distance.shape2polygon(this, shape)
+      return [distance, shortestSegment]
+    }
 
     throw Errors.OPERATION_IS_NOT_SUPPORTED
   }
@@ -282,15 +284,8 @@ export class Line extends Shape<Line> {
    * @param  pt
    * @returns {MultilineShapes}
    */
-  split(pt: Point | Point[]) {
-    if (pt instanceof Point) {
-      return [new Ray(pt, this.norm.invert()), new Ray(pt, this.norm)]
-    } else {
-      // const multiline = new Multiline([this])
-      // const sorted_points = this.sortPoints(pt)
-      // multiline.split(sorted_points)
-      // return multiline.toShapes()
-    }
+  split(pt: Point): (Ray | Segment | Ray)[] {
+    return [new Ray(pt, this.norm.invert()), new Ray(pt, this.norm)]
   }
 
   /**

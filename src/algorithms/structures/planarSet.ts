@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Interval, IntervalTree } from './intervalTree'
 import { Point } from '../../classes/point'
 import { Box } from '../../classes/box'
 import { Shape } from '../../classes/shape'
-import { Interval, IntervalTree } from './intervalTree'
+import { Face } from '../../classes/face'
+import { Edge } from '../../classes/edge'
 
 /**
  * Class representing a planar set - a generic container with ability to keep and retrieve shapes and
@@ -35,11 +37,21 @@ export class PlanarSet extends Set {
    * Another option to transfer as an object {key: Box, value: AnyShape}
    * @returns
    */
-  add(entry: Shape<any> | { key: Box; value: Shape<any> }) {
+  add(
+    entry:
+      | Shape<any>
+      | Edge
+      | Face
+      | { key: Box; value: Shape<any> | Edge | Face }
+  ) {
     const size = this.size
     let box: Box
-    let shape: Shape<any>
-    if (entry instanceof Shape) {
+    let shape: Shape<any> | Edge | Face
+    if (
+      entry instanceof Shape ||
+      entry instanceof Edge ||
+      entry instanceof Face
+    ) {
       box = entry.box
       shape = entry
     } else {
@@ -61,10 +73,20 @@ export class PlanarSet extends Set {
    * @returns
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  delete(entry: Shape<any> | { key: Box; value: Shape<any> }): boolean {
+  delete(
+    entry:
+      | Shape<any>
+      | Edge
+      | Face
+      | { key: Box; value: Shape<any> | Edge | Face }
+  ): boolean {
     let box: Box
-    let shape: Shape<any>
-    if (entry instanceof Shape) {
+    let shape: Shape<any> | Edge | Face
+    if (
+      entry instanceof Shape ||
+      entry instanceof Edge ||
+      entry instanceof Face
+    ) {
       box = entry.box
       shape = entry
     } else {
@@ -94,7 +116,7 @@ export class PlanarSet extends Set {
    * @param box - query box
    * @returns
    */
-  search(box: Box): Shape<any>[] {
+  search(box: Box): (Shape<any> | Edge | Face)[] {
     const resp = this.index.search(box)
     return resp
   }
@@ -104,7 +126,7 @@ export class PlanarSet extends Set {
    * @param  point - query point
    * @returns
    */
-  hit(point: Point): Shape<any>[] {
+  hit(point: Point): (Shape<any> | Edge | Face)[] {
     const box = new Box(point.x - 1, point.y - 1, point.x + 1, point.y + 1)
     const resp = this.index.search(box)
     return resp.filter((shape) => point.on(shape))

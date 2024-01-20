@@ -1,8 +1,10 @@
 import { Arc } from '../classes/arc'
 import { Box } from '../classes/box'
 import { Circle } from '../classes/circle'
+import { Edge } from '../classes/edge'
 import { Line } from '../classes/line'
 import { Point } from '../classes/point'
+import { Polygon } from '../classes/polygon'
 import { Ray } from '../classes/ray'
 import { Segment } from '../classes/segment'
 import { Vector } from '../classes/vector'
@@ -429,117 +431,123 @@ export function intersectArc2Box(arc: Arc, box: Box) {
   return ips
 }
 
-// export function intersectEdge2Segment(edge, segment) {
-//   return edge.isSegment()
-//     ? intersectSegment2Segment(edge.shape, segment)
-//     : intersectSegment2Arc(segment, edge.shape)
-// }
+export function intersectEdge2Segment(edge: Edge, segment: Segment) {
+  return edge.isSegment()
+    ? intersectSegment2Segment(edge.shape as Segment, segment)
+    : intersectSegment2Arc(segment, edge.shape as Arc)
+}
 
-// export function intersectEdge2Arc(edge, arc) {
-//   return edge.isSegment()
-//     ? intersectSegment2Arc(edge.shape, arc)
-//     : intersectArc2Arc(edge.shape, arc)
-// }
+export function intersectEdge2Arc(edge: Edge, arc: Arc) {
+  return edge.isSegment()
+    ? intersectSegment2Arc(edge.shape as Segment, arc)
+    : intersectArc2Arc(edge.shape as Arc, arc)
+}
 
-// export function intersectEdge2Line(edge, line) {
-//   return edge.isSegment()
-//     ? intersectSegment2Line(edge.shape, line)
-//     : intersectLine2Arc(line, edge.shape)
-// }
+export function intersectEdge2Line(edge: Edge, line: Line) {
+  return edge.isSegment()
+    ? intersectSegment2Line(edge.shape as Segment, line)
+    : intersectLine2Arc(line, edge.shape as Arc)
+}
 
-// export function intersectEdge2Circle(edge, circle) {
-//   return edge.isSegment()
-//     ? intersectSegment2Circle(edge.shape, circle)
-//     : intersectArc2Circle(edge.shape, circle)
-// }
+export function intersectEdge2Circle(edge: Edge, circle: Circle) {
+  return edge.isSegment()
+    ? intersectSegment2Circle(edge.shape as Segment, circle)
+    : intersectArc2Circle(edge.shape as Arc, circle)
+}
 
-// export function intersectSegment2Polygon(segment, polygon) {
-//   const ip = []
+export function intersectSegment2Polygon(
+  segment: Segment,
+  polygon: Polygon
+): Point[] {
+  const ip: Point[] = []
 
-//   for (const edge of polygon.edges) {
-//     for (const pt of intersectEdge2Segment(edge, segment)) {
-//       ip.push(pt)
-//     }
-//   }
+  for (const edge of polygon.edges) {
+    for (const pt of intersectEdge2Segment(edge, segment)) {
+      ip.push(pt)
+    }
+  }
 
-//   return ip
-// }
+  return ip
+}
 
-// export function intersectArc2Polygon(arc, polygon) {
-//   const ip = []
+export function intersectArc2Polygon(arc: Arc, polygon: Polygon): Point[] {
+  const ip: Point[] = []
 
-//   for (const edge of polygon.edges) {
-//     for (const pt of intersectEdge2Arc(edge, arc)) {
-//       ip.push(pt)
-//     }
-//   }
+  for (const edge of polygon.edges) {
+    for (const pt of intersectEdge2Arc(edge, arc)) {
+      ip.push(pt)
+    }
+  }
 
-//   return ip
-// }
+  return ip
+}
 
-// export function intersectLine2Polygon(line, polygon) {
-//   const ip = []
+export function intersectLine2Polygon(line: Line, polygon: Polygon): Point[] {
+  const ip: Point[] = []
 
-//   if (polygon.isEmpty()) {
-//     return ip
-//   }
+  if (polygon.isEmpty()) {
+    return ip
+  }
 
-//   for (const edge of polygon.edges) {
-//     for (const pt of intersectEdge2Line(edge, line)) {
-//       if (!ptInIntPoints(pt, ip)) {
-//         ip.push(pt)
-//       }
-//     }
-//   }
+  for (const edge of polygon.edges) {
+    for (const pt of intersectEdge2Line(edge, line)) {
+      if (!ptInIntPoints(pt, ip)) {
+        ip.push(pt)
+      }
+    }
+  }
 
-//   return line.sortPoints(ip)
-// }
+  return line.sortPoints(ip)
+}
 
-// export function intersectCircle2Polygon(circle, polygon) {
-//   const ip = []
+export function intersectCircle2Polygon(
+  circle: Circle,
+  polygon: Polygon
+): Point[] {
+  const ip: Point[] = []
 
-//   if (polygon.isEmpty()) {
-//     return ip
-//   }
+  if (polygon.isEmpty()) {
+    return ip
+  }
 
-//   for (const edge of polygon.edges) {
-//     for (const pt of intersectEdge2Circle(edge, circle)) {
-//       ip.push(pt)
-//     }
-//   }
+  for (const edge of polygon.edges) {
+    for (const pt of intersectEdge2Circle(edge, circle)) {
+      ip.push(pt)
+    }
+  }
 
-//   return ip
-// }
+  return ip
+}
 
-// export function intersectEdge2Edge(edge1, edge2) {
-//   const shape1 = edge1.shape
-//   const shape2 = edge2.shape
-//   return edge1.isSegment()
-//     ? edge2.isSegment()
-//       ? intersectSegment2Segment(shape1, shape2)
-//       : intersectSegment2Arc(shape1, shape2)
-//     : edge2.isSegment()
-//       ? intersectSegment2Arc(shape2, shape1)
-//       : intersectArc2Arc(shape1, shape2)
-// }
+export function intersectEdge2Edge(edge1: Edge, edge2: Edge): Point[] {
+  const shape1 = edge1.shape
+  const shape2 = edge2.shape
+  return edge1.isSegment()
+    ? edge2.isSegment()
+      ? intersectSegment2Segment(shape1 as Segment, shape2 as Segment)
+      : intersectSegment2Arc(shape1 as Segment, shape2 as Arc)
+    : edge2.isSegment()
+      ? intersectSegment2Arc(shape2 as Segment, shape1 as Arc)
+      : intersectArc2Arc(shape1 as Arc, shape2 as Arc)
+}
 
-// export function intersectEdge2Polygon(edge, polygon) {
-//   const ip = []
+export function intersectEdge2Polygon(edge: Edge, polygon: Polygon): Point[] {
+  const ip: Point[] = []
 
-//   if (polygon.isEmpty() || edge.shape.box.not_intersect(polygon.box)) {
-//     return ip
-//   }
+  if (polygon.isEmpty() || edge.shape.box.notIntersect(polygon.box)) {
+    return ip
+  }
 
-//   const resp_edges = polygon.edges.search(edge.shape.box)
+  const respEdges = polygon.edges.search(edge.shape.box) as Edge[]
 
-//   for (const resp_edge of resp_edges) {
-//     for (const pt of intersectEdge2Edge(edge, resp_edge)) {
-//       ip.push(pt)
-//     }
-//   }
+  for (const respEdge of respEdges) {
+    for (const pt of intersectEdge2Edge(edge, respEdge)) {
+      ip.push(pt)
+    }
+  }
 
-//   return ip
-// }
+  return ip
+}
 
 // export function intersectMultiline2Polygon(multiline, polygon) {
 //   let ip = []
@@ -557,25 +565,28 @@ export function intersectArc2Box(arc: Arc, box: Box) {
 //   return ip
 // }
 
-// export function intersectPolygon2Polygon(polygon1, polygon2) {
-//   const ip = []
+export function intersectPolygon2Polygon(
+  polygon1: Polygon,
+  polygon2: Polygon
+): Point[] {
+  const ip: Point[] = []
 
-//   if (polygon1.isEmpty() || polygon2.isEmpty()) {
-//     return ip
-//   }
+  if (polygon1.isEmpty() || polygon2.isEmpty()) {
+    return ip
+  }
 
-//   if (polygon1.box.not_intersect(polygon2.box)) {
-//     return ip
-//   }
+  if (polygon1.box.notIntersect(polygon2.box)) {
+    return ip
+  }
 
-//   for (const edge1 of polygon1.edges) {
-//     for (const pt of intersectEdge2Polygon(edge1, polygon2)) {
-//       ip.push(pt)
-//     }
-//   }
+  for (const edge1 of polygon1.edges) {
+    for (const pt of intersectEdge2Polygon(edge1, polygon2)) {
+      ip.push(pt)
+    }
+  }
 
-//   return ip
-// }
+  return ip
+}
 
 export function intersectBox2Box(box1: Box, box2: Box): Point[] {
   const ip = []
@@ -589,17 +600,20 @@ export function intersectBox2Box(box1: Box, box2: Box): Point[] {
   return ip
 }
 
-// export function intersectShape2Polygon(shape, polygon) {
-//   if (shape instanceof Line) {
-//     return intersectLine2Polygon(shape, polygon)
-//   } else if (shape instanceof Segment) {
-//     return intersectSegment2Polygon(shape, polygon)
-//   } else if (shape instanceof Arc) {
-//     return intersectArc2Polygon(shape, polygon)
-//   } else {
-//     return []
-//   }
-// }
+export function intersectShape2Polygon(
+  shape: Line | Segment | Arc,
+  polygon: Polygon
+) {
+  if (shape instanceof Line) {
+    return intersectLine2Polygon(shape, polygon)
+  } else if (shape instanceof Segment) {
+    return intersectSegment2Polygon(shape, polygon)
+  } else if (shape instanceof Arc) {
+    return intersectArc2Polygon(shape, polygon)
+  } else {
+    return []
+  }
+}
 
 function ptInIntPoints(newPt: Point, ip: Point[]): boolean {
   return ip.some((pt) => pt.equalTo(newPt))
@@ -644,8 +658,8 @@ export function intersectRay2Ray(ray1: Ray, ray2: Ray) {
     .filter((pt) => ray2.contains(pt))
 }
 
-// export function intersectRay2Polygon(ray, polygon) {
-//   return intersectLine2Polygon(createLineFromRay(ray), polygon).filter((pt) =>
-//     ray.contains(pt)
-//   )
-// }
+export function intersectRay2Polygon(ray: Ray, polygon: Polygon) {
+  return intersectLine2Polygon(createLineFromRay(ray), polygon).filter((pt) =>
+    ray.contains(pt)
+  )
+}

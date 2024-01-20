@@ -11,8 +11,8 @@ import { Distance } from '../algorithms/distance'
 import { Arc } from './arc'
 import { Circle } from './circle'
 import { Ray } from './ray'
-
-// import { Vector } from './vector'
+import { Polygon } from './polygon'
+import { PlanarSet } from '../algorithms/structures/planarSet'
 
 /**
  *
@@ -155,7 +155,7 @@ export class Point extends Shape<Point> implements SimplePoint {
    * @returns {Segment} shortest segment between point and shape (started at point, ended at shape)
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  distanceTo(shape: Shape<any>): [number, Segment] {
+  distanceTo(shape: Shape<any> | Polygon): [number, Segment] {
     if (shape instanceof Point) {
       const dx = shape.x - this.x
       const dy = shape.y - this.y
@@ -178,13 +178,13 @@ export class Point extends Shape<Point> implements SimplePoint {
       return Distance.point2arc(this, shape)
     }
 
-    //     if (shape instanceof Flatten.Polygon) {
-    //       return Flatten.Distance.point2polygon(this, shape)
-    //     }
+    if (shape instanceof Polygon) {
+      return Distance.point2polygon(this, shape)
+    }
 
-    //     if (shape instanceof Flatten.PlanarSet) {
-    //       return Flatten.Distance.shape2planarSet(this, shape)
-    //     }
+    if (shape instanceof PlanarSet) {
+      return Distance.shape2planarSet(this, shape)
+    }
 
     throw Errors.OPERATION_IS_NOT_SUPPORTED
   }
@@ -224,9 +224,9 @@ export class Point extends Shape<Point> implements SimplePoint {
       return shape.contains(this)
     }
 
-    // if (shape instanceof Flatten.Polygon) {
-    //   return shape.contains(this)
-    // }
+    if (shape instanceof Polygon) {
+      return shape.contains(this)
+    }
     return false
   }
 

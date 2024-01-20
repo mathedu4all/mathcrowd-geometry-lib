@@ -105,4 +105,11 @@ export class Edge implements LinkedListElement {
   contains(pt: Point): boolean {
     return this.shape.contains(pt)
   }
+
+  /**
+   * Reverse edge direction
+   */
+  reverse(): void {
+    this.shape = this.shape.reverse()
+  }
 }

@@ -2,6 +2,7 @@ import { Matrix } from './matrix'
 import { Errors } from '../utils/errors'
 import type { Box } from './box'
 import type { Vector } from './vector'
+import type { Segment } from './segment'
 import { SimplePoint } from './types'
 
 /**
@@ -74,5 +75,14 @@ export class Shape<T extends Shape<T>> {
    */
   transform(_matrix: Matrix): T {
     throw Errors.CANNOT_INVOKE_ABSTRACT_METHOD
+  }
+
+  /**
+   * Get distance to shape.
+   * @param shape
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  distanceTo(_shape: Shape<any>): [number, Segment] {
+    throw Errors.OPERATION_IS_NOT_SUPPORTED
   }
 }

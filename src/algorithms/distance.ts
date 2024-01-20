@@ -9,10 +9,10 @@ import { Circle } from '../classes/circle'
 import { Arc } from '../classes/arc'
 import { IntervalTree, Node } from './structures/intervalTree'
 import { PlanarSet } from './structures/planarSet'
-// import { Shape } from '../classes/shape'
-// import { Edge } from '../classes/edge'
-// import { Polygon } from '../classes/polygon'
 import { Box } from '../classes/box'
+import { Polygon } from '../classes/polygon'
+import { Shape } from '../classes/shape'
+import { Edge } from '../classes/edge'
 
 export class Distance {
   /**
@@ -424,55 +424,42 @@ export class Distance {
     }
   }
 
-  //   /**
-  //    * Calculate distance and shortest segment between point and polygon
-  //    * @param point
-  //    * @param polygon
-  //    * @returns {Number | Segment} - distance and shortest segment
-  //    */
-  //   static point2polygon(point, polygon) {
-  //     let min_distanceAndSegment = [Number.POSITIVE_INFINITY, new Segment()]
-  //     for (const edge of polygon.edges) {
-  //       const [dist, shortestSegment] =
-  //         edge.shape instanceof Segment
-  //           ? Distance.point2segment(point, edge.shape)
-  //           : Distance.point2arc(point, edge.shape)
-  //       if (LT(dist, min_distanceAndSegment[0])) {
-  //         min_distanceAndSegment = [dist, shortestSegment]
-  //       }
-  //     }
-  //     return min_distanceAndSegment
-  //   }
+  /**
+   * Calculate distance and shortest segment between point and polygon
+   * @param point
+   * @param polygon
+   * @returns {Number | Segment} - distance and shortest segment
+   */
+  static point2polygon(point: Point, polygon: Polygon): [number, Segment] {
+    let minDistanceAndSegment: [number, Segment] = [
+      Number.POSITIVE_INFINITY,
+      new Segment()
+    ]
+    for (const edge of polygon.edges) {
+      const [dist, shortestSegment] =
+        edge.shape instanceof Segment
+          ? Distance.point2segment(point, edge.shape)
+          : Distance.point2arc(point, edge.shape)
+      if (LT(dist, minDistanceAndSegment[0])) {
+        minDistanceAndSegment = [dist, shortestSegment]
+      }
+    }
+    return minDistanceAndSegment
+  }
 
-  //   static shape2polygon(shape, polygon) {
-  //     let min_distanceAndSegment = [Number.POSITIVE_INFINITY, new Segment()]
-  //     for (const edge of polygon.edges) {
-  //       const [dist, shortestSegment] = shape.distanceTo(edge.shape)
-  //       if (LT(dist, min_distanceAndSegment[0])) {
-  //         min_distanceAndSegment = [dist, shortestSegment]
-  //       }
-  //     }
-  //     return min_distanceAndSegment
-  //   }
-
-  //   /**
-  //    * Calculate distance and shortest segment between two polygons
-  //    * @param polygon1
-  //    * @param polygon2
-  //    * @returns {Number | Segment} - distance and shortest segment
-  //    */
-  //   static polygon2polygon(polygon1, polygon2) {
-  //     let min_distanceAndSegment = [Number.POSITIVE_INFINITY, new Segment()]
-  //     for (const edge1 of polygon1.edges) {
-  //       for (const edge2 of polygon2.edges) {
-  //         const [dist, shortestSegment] = edge1.shape.distanceTo(edge2.shape)
-  //         if (LT(dist, min_distanceAndSegment[0])) {
-  //           min_distanceAndSegment = [dist, shortestSegment]
-  //         }
-  //       }
-  //     }
-  //     return min_distanceAndSegment
-  //   }
+  static shape2polygon(shape: Shape<any>, polygon: Polygon): [number, Segment] {
+    let minDistanceAndSegment: [number, Segment] = [
+      Number.POSITIVE_INFINITY,
+      new Segment()
+    ]
+    for (const edge of polygon.edges) {
+      const [dist, shortestSegment] = shape.distanceTo(edge.shape)
+      if (LT(dist, minDistanceAndSegment[0])) {
+        minDistanceAndSegment = [dist, shortestSegment]
+      }
+    }
+    return minDistanceAndSegment
+  }
 
   /**
    * Returns [mindist, maxdist] array of *squared* minimal and maximal distance between boxes
@@ -529,11 +516,11 @@ export class Distance {
     for (const node of level) {
       ;[minDist, maxDist] = Distance.box2boxMinMax(shape.box, node.item.key)
 
-      // if (node.item.value instanceof Edge) {
-      //   tree.insert([minDist, maxDist], node.item.value.shape)
-      // } else {
-      tree.insert([minDist, maxDist], node.item.value)
-      // }
+      if (node.item.value instanceof Edge) {
+        tree.insert([minDist, maxDist], node.item.value.shape)
+      } else {
+        tree.insert([minDist, maxDist], node.item.value)
+      }
 
       if (LT(maxDist, minStop)) {
         minStop = maxDist // update minStop
@@ -637,7 +624,7 @@ export class Distance {
    * @param shape
    * @param set
    * @param minStop
-   * @returns {*}
+   * @returns
    */
   static shape2planarSet(
     shape: Segment | Arc | Circle | Line | Point,
@@ -673,8 +660,8 @@ export class Distance {
   }
 
   static distance(
-    shape1: Arc | Circle | Line | Segment | Point,
-    shape2: Arc | Circle | Line | Segment | Point
+    shape1: Arc | Circle | Line | Segment | Point | Polygon,
+    shape2: Arc | Circle | Line | Segment | Point | Polygon
   ): [number, Segment] {
     return shape1.distanceTo(shape2)
   }

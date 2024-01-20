@@ -12,6 +12,8 @@ import { Distance } from '../algorithms/distance'
 import { Matrix } from './matrix'
 import { Circle } from './circle'
 import { Ray } from './ray'
+import { Polygon } from './polygon'
+import { PlanarSet } from '../algorithms/structures/planarSet'
 
 /**
  * Class representing a circular arc
@@ -193,9 +195,11 @@ export class Arc extends Shape<Arc> {
    * to start or end point of the arc, return clone of the arc. If point does not belong to the arcs, return
    * empty array.
    * @param pt Query point
-   * @returns {Arc[]}
+   * @returns
    */
-  split(pt: Point): Arc[] {
+  split(pt: Point): [Arc, Arc] | [Arc] | [] {
+    if (!this.contains(pt)) return []
+
     if (this.start.equalTo(pt)) return [this.clone()]
 
     if (this.end.equalTo(pt)) return [this.clone()]
@@ -285,9 +289,9 @@ export class Arc extends Shape<Arc> {
     if (shape instanceof Arc) {
       return Intersection.intersectArc2Arc(this, shape)
     }
-    // if (shape instanceof Polygon) {
-    //   return Intersection.intersectArc2Polygon(this, shape)
-    // }
+    if (shape instanceof Polygon) {
+      return Intersection.intersectArc2Polygon(this, shape)
+    }
     return []
   }
 
@@ -297,7 +301,7 @@ export class Arc extends Shape<Arc> {
    * @returns distance from arc to shape abd shortest segment between arc and shape (started at arc, ended at shape)
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  distanceTo(shape: Shape<any>): [number, Segment] {
+  distanceTo(shape: Shape<any> | Polygon): [number, Segment] {
     if (shape instanceof Point) {
       const [dist, shortestSegment] = Distance.point2arc(shape, this)
       return [dist, shortestSegment.reverse()]
@@ -323,15 +327,15 @@ export class Arc extends Shape<Arc> {
       return [dist, shortestSegment]
     }
 
-    // if (shape instanceof Polygon) {
-    //   const [dist, shortestSegment] = Distance.shape2polygon(this, shape)
-    //   return [dist, shortestSegment]
-    // }
+    if (shape instanceof Polygon) {
+      const [dist, shortestSegment] = Distance.shape2polygon(this, shape)
+      return [dist, shortestSegment]
+    }
 
-    // if (shape instanceof PlanarSet) {
-    //   const [dist, shortestSegment] = Distance.shape2planarSet(this, shape)
-    //   return [dist, shortestSegment]
-    // }
+    if (shape instanceof PlanarSet) {
+      const [dist, shortestSegment] = Distance.shape2planarSet(this, shape)
+      return [dist, shortestSegment]
+    }
     throw Errors.OPERATION_IS_NOT_SUPPORTED
   }
 

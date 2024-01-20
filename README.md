@@ -6,6 +6,12 @@ lines, circles, and polygons, intersection detection. Shapes may be organized in
 It was developed for [omath.fun](https://omath.fun), an mathematics education
 project. It was running by [mathedu4all.com](https://mathedu4all.com) an online community for math enthusiasts.
 
+## Features
+
+- Support finding the distance and segment between any shape.
+- Support affine transform on any shape.
+- Support finding all intersection between any shape.
+
 ## API
 
 http://agile.pages.mathcrowd.cn:2880/frontend/mathcrowd-geometry-lib/docs/

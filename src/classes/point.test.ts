@@ -1,6 +1,9 @@
+import { Arc } from './arc'
+import { circle, Circle } from './circle'
 import { Line } from './line'
 import { matrix } from './matrix'
 import { point, Point } from './point'
+import { Polygon } from './polygon'
 import { Segment } from './segment'
 import { Vector } from './vector'
 
@@ -116,37 +119,38 @@ describe('Point.Distance methods', function () {
     expect(pt2.distanceTo(segment)[0]).toEqual(3)
     expect(pt3.distanceTo(segment)[0]).toEqual(4)
   })
-  //   it('Method distanceTo returns distance to circle', function () {
-  //     const circle = new Circle(new Point(), 3)
-  //     const pt1 = new Point(5, 0)
-  //     const pt2 = new Point(0, 2)
-  //     expect(pt1.distanceTo(circle)[0]).to.equal(2)
-  //     expect(pt2.distanceTo(circle)[0]).to.equal(1)
-  //   })
-  //   it('Method distanceTo returns distance to arc', function () {
-  //     const circle = new Circle(new Point(), 3)
-  //     const arc = circle.toArc()
-  //     const pt1 = new Point(5, 0)
-  //     const pt2 = new Point(0, 2)
-  //     expect(pt1.distanceTo(arc)[0]).to.equal(2)
-  //     expect(pt2.distanceTo(arc)[0]).to.equal(1)
-  //   })
-  //   it('Method distanceTo returns distance to polygon', function () {
-  //     const points = [
-  //       point(100, 20),
-  //       point(250, 75),
-  //       point(350, 75),
-  //       point(300, 270),
-  //       point(170, 200),
-  //       point(120, 350),
-  //       point(70, 120)
-  //     ]
-  //     const poly = new Polygon()
-  //     poly.addFace(points)
-  //     const pt = point(300, 50)
-  //     expect(pt.distanceTo(poly)[0]).to.equal(25)
-  //   })
+  it('Method distanceTo returns distance to circle', function () {
+    const circle = new Circle(new Point(), 3)
+    const pt1 = new Point(5, 0)
+    const pt2 = new Point(0, 2)
+    expect(pt1.distanceTo(circle)[0]).toBe(2)
+    expect(pt2.distanceTo(circle)[0]).toBe(1)
+  })
+  it('Method distanceTo returns distance to arc', function () {
+    const circle = new Circle(new Point(), 3)
+    const arc = circle.toArc()
+    const pt1 = new Point(5, 0)
+    const pt2 = new Point(0, 2)
+    expect(pt1.distanceTo(arc)[0]).toBe(2)
+    expect(pt2.distanceTo(arc)[0]).toBe(1)
+  })
+  it('Method distanceTo returns distance to polygon', function () {
+    const points = [
+      point(100, 20),
+      point(250, 75),
+      point(350, 75),
+      point(300, 270),
+      point(170, 200),
+      point(120, 350),
+      point(70, 120)
+    ]
+    const poly = new Polygon()
+    poly.addFace(points)
+    const pt = point(300, 50)
+    expect(pt.distanceTo(poly)[0]).toBe(25)
+  })
 })
+
 describe('Point.On inclusion queries', function () {
   it('Method "on" returns true if point checked with same points', function () {
     const pt = new Point(0, 1)
@@ -159,11 +163,11 @@ describe('Point.On inclusion queries', function () {
     const line = new Line(pt1, pt2)
     expect(pt3.on(line)).toEqual(true)
   })
-  //   it('Method "on" returns true if point belongs to circle', function () {
-  //     const pt = new Point(0, 1)
-  //     const circle = new Circle(new Point(0, 0), 2)
-  //     expect(pt.on(circle)).to.equal(true)
-  //   })
+  it('Method "on" returns true if point belongs to circle', function () {
+    const pt = new Point(0, 1)
+    const circle = new Circle(new Point(0, 0), 2)
+    expect(pt.on(circle)).toBe(true)
+  })
   it('Method "on" returns true if point belongs to segment', function () {
     const pt1 = new Point(1, 1)
     const pt2 = new Point(2, 2)
@@ -171,34 +175,35 @@ describe('Point.On inclusion queries', function () {
     const segment = new Line(pt1, pt3)
     expect(pt2.on(segment)).toEqual(true)
   })
-  //   it('Method "on" returns true if point belongs to arc', function () {
-  //     const arc = new Arc(new Point(), 1, -Math.PI / 4, Math.PI / 4, false)
-  //     const pt = new Point(-1, 0)
-  //     expect(pt.on(arc)).to.equal(true)
-  //   })
-  //   it('Method "on" returns true if point belong to polygon', function () {
-  //     const points = [
-  //       point(100, 20),
-  //       point(250, 75),
-  //       point(350, 75),
-  //       point(300, 270),
-  //       point(170, 200),
-  //       point(120, 350),
-  //       point(70, 120)
-  //     ]
-  //     const poly = new Polygon()
-  //     poly.addFace(points)
-  //     poly.addFace([circle(point(175, 150), 30).toArc()])
-  //     const pt1 = point(300, 50)
-  //     const pt2 = point(50, 75)
-  //     const pt3 = point(180, 160)
-  //     const pt4 = point(140, 250)
-  //     expect(pt1.on(poly)).to.equal(false)
-  //     expect(pt2.on(poly)).to.equal(false)
-  //     expect(pt3.on(poly)).to.equal(false)
-  //     expect(pt4.on(poly)).to.equal(true)
-  //   })
+  it('Method "on" returns true if point belongs to arc', function () {
+    const arc = new Arc(new Point(), 1, -Math.PI / 4, Math.PI / 4, false)
+    const pt = new Point(-1, 0)
+    expect(pt.on(arc)).toBe(true)
+  })
+
+  // it('Method "on" returns true if point belong to polygon', function () {
+  //   const points = [
+  //     point(100, 20),
+  //     point(250, 75),
+  //     point(350, 75),
+  //     point(300, 270),
+  //     point(170, 200),
+  //     point(120, 350),
+  //     point(70, 120)
+  //   ]
+  //   const poly = new Polygon()
+  //   poly.addFace(points)
+  //   poly.addFace([circle(point(175, 150), 30).toArc()])
+  //   const pt1 = point(300, 50)
+  //   const pt2 = point(50, 75)
+  //   const pt3 = point(180, 160)
+  //   const pt4 = point(140, 250)
+  //   expect(pt1.on(poly)).toBe(false)
+  //   expect(pt2.on(poly)).toBe(false)
+  //   expect(pt3.on(poly)).toBe(false)
+  //   expect(pt4.on(poly)).toBe(true)
   // })
+
   it('Method leftTo returns true if point is on the "left" semi plane, which is the side of the normal vector', function () {
     const line = new Line(new Point(-1, -1), new Point(1, 1))
     const pt1 = new Point(-2, 2)

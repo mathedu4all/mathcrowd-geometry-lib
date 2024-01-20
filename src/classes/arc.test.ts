@@ -1,13 +1,11 @@
 import {
   Point,
-  // Circle,
   Line,
   Segment,
   Arc,
-  // Polygon,
+  Polygon,
   point,
   vector,
-  // circle,
   arc,
   matrix,
   circle,
@@ -257,39 +255,39 @@ describe('Arc.intersect', function () {
     const ip = arc1.intersect(arc2)
     expect(ip.length).toBe(4)
   })
-  // it('Intersect arc with polygon', function () {
-  //   const points = [
-  //     point(100, 20),
-  //     point(250, 75),
-  //     point(350, 75),
-  //     point(300, 200),
-  //     point(170, 200),
-  //     point(120, 350),
-  //     point(70, 120)
-  //   ]
-  //   const polygon = new Polygon()
-  //   polygon.addFace(points)
-  //   const arc = new Arc(point(150, 50), 50, Math.PI / 3, (5 * Math.PI) / 3, CCW)
-  //   expect(arc.intersect(polygon).length).toBe(1)
-  // })
-  // it('Intersect arc with box', function () {
-  //   const points = [
-  //     point(100, 20),
-  //     point(250, 75),
-  //     point(350, 75),
-  //     point(300, 200),
-  //     point(170, 200),
-  //     point(120, 350),
-  //     point(70, 120)
-  //   ]
-  //   const polygon = new Polygon()
-  //   polygon.addFace(points)
-  //   const arc = new Arc(point(150, 50), 50, Math.PI / 3, (5 * Math.PI) / 3, CCW)
-  //   expect(arc.intersect(polygon.box).length).toBe(1)
-  // })
+  it('Intersect arc with polygon', function () {
+    const points = [
+      point(100, 20),
+      point(250, 75),
+      point(350, 75),
+      point(300, 200),
+      point(170, 200),
+      point(120, 350),
+      point(70, 120)
+    ]
+    const polygon = new Polygon()
+    polygon.addFace(points)
+    const arc = new Arc(point(150, 50), 50, Math.PI / 3, (5 * Math.PI) / 3, CCW)
+    expect(arc.intersect(polygon).length).toBe(1)
+  })
+  it('Intersect arc with box', function () {
+    const points = [
+      point(100, 20),
+      point(250, 75),
+      point(350, 75),
+      point(300, 200),
+      point(170, 200),
+      point(120, 350),
+      point(70, 120)
+    ]
+    const polygon = new Polygon()
+    polygon.addFace(points)
+    const arc = new Arc(point(150, 50), 50, Math.PI / 3, (5 * Math.PI) / 3, CCW)
+    expect(arc.intersect(polygon.box).length).toBe(1)
+  })
 })
 
-describe('#Arc.pointAtLength', function () {
+describe('Arc.pointAtLength', function () {
   it('Calculate signed area under circular arc, full circle case, CCW', function () {
     const arc = new Arc(point(0, 1), 1, 0, 2 * Math.PI, true)
     const area = arc.definiteIntegral()
