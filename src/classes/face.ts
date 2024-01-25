@@ -44,6 +44,7 @@ export class Face extends CircularLinkedList {
       | [[number, number][]]
       | [(Segment | Arc)[]]
       | [Box | Circle]
+      | [Edge, Edge]
   ) {
     super()
 
@@ -105,6 +106,18 @@ export class Face extends CircularLinkedList {
     if (args.length === 1 && args[0] instanceof Circle) {
       const arc = args[0].toArc(CCW)
       this.shapes2face(polygon.edges, [arc])
+    }
+
+    if (
+      args.length === 2 &&
+      args[0] instanceof Edge &&
+      args[1] instanceof Edge
+    ) {
+      this.first = args[0]
+      this.last = args[1]
+      this.last.next = this.first
+      this.first.prev = this.last
+      this.setArcLength()
     }
   }
 

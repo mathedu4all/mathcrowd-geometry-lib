@@ -1,4 +1,5 @@
 import {
+  Box,
   Point,
   Vector,
   Line,
@@ -11,7 +12,8 @@ import {
   Circle,
   Arc,
   ray,
-  Ray
+  Ray,
+  Polygon
 } from '../index'
 import { CCW } from '../utils/constants'
 
@@ -83,7 +85,7 @@ describe('Line', function () {
     expect(l.coord(point(0, 200))).toBe(0)
   })
 })
-describe('#Line.intersect methods return array of intersection points if intersection exist', function () {
+describe('Line.intersect methods return array of intersection points if intersection exist', function () {
   it('Line to line intersection', function () {
     const line1 = new Line(new Point(0, 1), new Point(2, 1))
     const line2 = new Line(new Point(1, 0), new Point(1, 2))
@@ -131,47 +133,52 @@ describe('#Line.intersect methods return array of intersection points if interse
     const ip = line.intersect(arc)
     expect(ip.length).toBe(0)
   })
-  // it('Line to polygon intersection', function () {
-  //   'use strict'
+  it('Line to polygon intersection', function () {
+    const points = [
+      point(100, 20),
+      point(250, 75),
+      point(350, 75),
+      point(300, 200),
+      point(170, 200),
+      point(120, 350),
+      point(70, 120)
+    ]
+    const polygon = new Polygon()
+    polygon.addFace(points)
 
-  //   const points = [
-  //     point(100, 20),
-  //     point(250, 75),
-  //     point(350, 75),
-  //     point(300, 200),
-  //     point(170, 200),
-  //     point(120, 350),
-  //     point(70, 120)
-  //   ]
-  //   const polygon = new Polygon()
-  //   polygon.addFace(points)
+    const line = new Line(point(100, 20), point(300, 200))
 
-  //   const line = new Line(point(100, 20), point(300, 200))
+    const ip = line.intersect(polygon)
+    expect(ip.length).toBe(2)
+  })
+  it('Line to box intersection', function () {
+    const points = [
+      point(100, 20),
+      point(250, 75),
+      point(350, 75),
+      point(300, 200),
+      point(170, 200),
+      point(120, 350),
+      point(70, 120)
+    ]
+    const polygon = new Polygon()
+    polygon.addFace(points)
 
-  //   const ip = line.intersect(polygon)
-  //   expect(ip.length).toBe(2)
-  // })
-  //   it('Line to box intersection', function () {
-  //     'use strict'
+    const line = new Line(point(100, 20), point(300, 200))
 
-  //     const points = [
-  //       point(100, 20),
-  //       point(250, 75),
-  //       point(350, 75),
-  //       point(300, 200),
-  //       point(170, 200),
-  //       point(120, 350),
-  //       point(70, 120)
-  //     ]
-  //     const polygon = new Polygon()
-  //     polygon.addFace(points)
+    const ip = line.intersect(polygon.box)
+    expect(ip.length).toBe(2)
+  })
 
-  //     const line = new Line(point(100, 20), point(300, 200))
+  it('Line to square box intersection', function () {
+    const point = new Point(300, 300)
+    const norm = new Vector(0, 1)
+    const line = new Line(point, norm)
+    const box = new Box(0, 0, 600, 600)
+    const ip = line.intersect(box)
+    expect(ip.length).toBe(2)
+  })
 
-  //     const ip = line.intersect(polygon.box)
-  //     expect(ip.length).toBe(2)
-  //   })
-  // })
   it('May check if two lines are parallel', function () {
     const line1 = new Line(new Point(0, 2), new Point(2, 0))
     const line2 = new Line(new Point(4, 0), new Point(0, 4))

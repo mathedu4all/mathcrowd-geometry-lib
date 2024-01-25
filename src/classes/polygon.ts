@@ -203,7 +203,14 @@ export class Polygon extends Shape<Polygon> {
    * You can chain method face.reverse() is you need to change direction of the creates face
    * @returns {Face}
    */
-  addFace(...args: [Point[]] | [(Segment | Arc)[]] | [Circle | Box]): Face {
+  addFace(
+    ...args:
+      | [Point[]]
+      | [(Segment | Arc)[]]
+      | [Circle | Box]
+      | [Edge, Edge]
+      | [[number, number][]]
+  ): Face {
     const face = new Face(this, ...args)
     this.faces.add(face)
     return face
@@ -233,18 +240,15 @@ export class Polygon extends Shape<Polygon> {
     }
 
     let unassignedEdgeFound = true
-    let face: Face | undefined = undefined
+    let first: Edge | null = null
+
     while (unassignedEdgeFound) {
       unassignedEdgeFound = false
 
       // Find first unassigned edge
       for (const edge of this.edges) {
         if (edge.face === null) {
-          if (face) {
-            this.faces.add(face)
-          }
-          face = new Face(this)
-          face.append(edge)
+          first = edge
           unassignedEdgeFound = true
           break
         }
@@ -252,15 +256,14 @@ export class Polygon extends Shape<Polygon> {
 
       if (unassignedEdgeFound) {
         // Add all connected edges to the face
-        let edge = face!.first as Edge
-        while (edge.next !== face!.first) {
-          edge = edge.next as Edge
-          face!.append(edge)
-        }
+        let last = first as Edge
+        do {
+          last = last.next as Edge
+        } while (last.next !== first)
+        this.addFace(first, last)
+        // console.log(edge.shape)
+        // console.log(edge.next!.shape)
       }
-    }
-    if (face) {
-      this.faces.add(face)
     }
   }
 

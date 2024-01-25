@@ -13,7 +13,9 @@ import {
   vector,
   circle,
   segment,
-  box
+  box,
+  polygon,
+  Face
 } from '../index'
 import { CCW, ORIENTATION } from '../utils/constants'
 
@@ -405,5 +407,15 @@ describe('Polygon transform', () => {
     const pp = new Point(-0.07776044568759738, 51.47918678917519)
     const contains = poly.contains(pp)
     expect(contains).toBe(false)
+  })
+  it('recreate Faces.', () => {
+    const face1 = [point(0, 0), point(1, 0), point(1, 1), point(0, 1)]
+    const face2 = [point(1, 0), point(2, 0), point(2, 1), point(1, 1)]
+    const poly = new Polygon()
+    poly.addFace(face1)
+    poly.addFace(face2)
+    expect(poly.edges.size).toBe(8)
+    poly.recreateFaces()
+    expect(poly.faces.size).toBe(2)
   })
 })

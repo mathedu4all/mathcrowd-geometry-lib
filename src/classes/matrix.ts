@@ -162,11 +162,11 @@ export class Matrix {
 /**
  * Function to create matrix equivalent to "new" constructor
  * @param {number} a - position(0,0)   sx*cos(alpha)
- * @param {number} b - position (0,1)  sx*sin(alpha)
- * @param {number} c - position (1,0)  -sy*sin(alpha)
- * @param {number} d - position (1,1)  sy*cos(alpha)
- * @param {number} tx - position (2,0) translation by x
- * @param {number} ty - position (2,1) translation by y
+ * @param {number} b - position(0,1)  sx*sin(alpha)
+ * @param {number} c - position(1,0)  -sy*sin(alpha)
+ * @param {number} d - position(1,1)  sy*cos(alpha)
+ * @param {number} tx - position(2,0) translation by x
+ * @param {number} ty - position(2,1) translation by y
  */
 export const matrix = (
   a: number = 1,
