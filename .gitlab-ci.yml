@@ -10,7 +10,6 @@ cache: &global_cache
     files:
       - ./package.json
   paths:
-    - .npm
     - node_modules
   policy: pull
 
@@ -32,7 +31,7 @@ install-dependencies:
     - echo "Created the following .npmrc:"; cat .npmrc
     - npm config set proxy http://192.168.10.100:88
     - npm config set https-proxy http://192.168.10.100:88
-    - npm  --cache .npm ci
+    - npm ci
   cache:
     <<: *global_cache
     # override the policy
