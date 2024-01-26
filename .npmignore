@@ -1,0 +1,13 @@
+.*
+tsconfig*
+typedoc*
+jest*
+eslint*
+rollup*
+
+docs/
+coverage/
+src/
+node_modules/
+
+package-lock.json

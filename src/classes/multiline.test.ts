@@ -1,4 +1,4 @@
-import { point, vector, segment } from '../index'
+import { point, segment } from '../index'
 import { Edge } from './edge'
 import { Multiline } from './multiline'
 

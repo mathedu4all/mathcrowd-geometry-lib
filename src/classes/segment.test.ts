@@ -8,7 +8,8 @@ import {
   vector,
   line,
   segment,
-  Circle
+  Circle,
+  Polygon
 } from '../index'
 import { EQ } from '../utils/utils'
 
@@ -162,44 +163,40 @@ describe('Segment.Intersect', function () {
     expect(segment.intersect(circle).length).toBe(1)
     expect(segment.intersect(circle)[0].equalTo(ipExpected)).toBe(true)
   })
-  // it('Intersection with Polygon', function () {
-  //   const segment = new Segment(150, -20, 150, 60)
+  it('Intersection with Polygon', function () {
+    const segment = new Segment(150, -20, 150, 60)
 
-  //   const points = [
-  //     point(100, 20),
-  //     point(200, 20),
-  //     point(200, 40),
-  //     point(100, 40)
-  //   ]
+    const points = [
+      point(100, 20),
+      point(200, 20),
+      point(200, 40),
+      point(100, 40)
+    ]
 
-  //   const poly = new Polygon()
-  //   const face = poly.addFace(points)
+    const poly = new Polygon()
+    poly.addFace(points)
+    const ip = segment.intersect(poly)
+    expect(ip.length).toBe(2)
+    expect(ip[0].equalTo(point(150, 20))).toBe(true)
+    expect(ip[1].equalTo(point(150, 40))).toBe(true)
+  })
+  it('Intersection with Box', function () {
+    const segment = new Segment(150, -20, 150, 60)
 
-  //   const ip_expected = new Point(0, 2)
-  //   const ip = segment.intersect(poly)
-  //   expect(ip.length).toBe(2)
-  //   expect(ip[0].equalTo(point(150, 20))).toBe(true)
-  //   expect(ip[1].equalTo(point(150, 40))).toBe(true)
-  // })
-  // it('Intersection with Box', function () {
-  //   const segment = new Segment(150, -20, 150, 60)
+    const points = [
+      point(100, 20),
+      point(200, 20),
+      point(200, 40),
+      point(100, 40)
+    ]
 
-  //   const points = [
-  //     point(100, 20),
-  //     point(200, 20),
-  //     point(200, 40),
-  //     point(100, 40)
-  //   ]
-
-  //   const poly = new Polygon()
-  //   const face = poly.addFace(points)
-
-  //   const ip_expected = new Point(0, 2)
-  //   const ip = segment.intersect(poly.box)
-  //   expect(ip.length).toBe(2)
-  //   expect(ip[0].equalTo(point(150, 20))).toBe(true)
-  //   expect(ip[1].equalTo(point(150, 40))).toBe(true)
-  // })
+    const poly = new Polygon()
+    poly.addFace(points)
+    const ip = segment.intersect(poly.box)
+    expect(ip.length).toBe(2)
+    expect(ip[0].equalTo(point(150, 20))).toBe(true)
+    expect(ip[1].equalTo(point(150, 40))).toBe(true)
+  })
   it('Intersection between two very close lines returns zero intersections (#99)', () => {
     const s1 = segment([34.35, 36.557426400375626, 25.4, 36.557426400375626])
     const s2 = segment([25.4, 36.55742640037563, 31.25, 36.55742640037563])

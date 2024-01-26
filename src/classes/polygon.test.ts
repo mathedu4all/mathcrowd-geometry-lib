@@ -13,9 +13,7 @@ import {
   vector,
   circle,
   segment,
-  box,
-  polygon,
-  Face
+  box
 } from '../index'
 import { CCW, ORIENTATION } from '../utils/constants'
 
