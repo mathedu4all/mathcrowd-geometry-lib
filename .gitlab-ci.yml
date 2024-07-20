@@ -3,5 +3,56 @@ stages:
   - test
   - build
   - publish
+  - post-publish
 include:
-  - component: cloud.mathcrowd.cn:2444/agile/frontend/frontend-ci/npm-package@1.0
+  - component: cloud.mathcrowd.cn:2444/agile/frontend/frontend-ci/npm-package@13.0
+
+trigger-update:
+  stage: post-publish
+  only:
+    - tags
+  tags:
+    - k8s-runner
+  script:
+    # Extract a few values from package.json
+    - |
+      NPM_PACKAGE_NAME=$(node -p "require('./package.json').name")
+      NPM_PACKAGE_VERSION=$(node -p "require('./package.json').version")
+      PROJECTS=agile/frontend/pixi-react-lib
+      git config --global user.email "bot@mathcrowd.cn"
+      git config --global user.name "Gitlab CI Bot"
+      mkdir -p ~/.ssh
+      chmod 700 ~/.ssh
+      ssh-keyscan $CI_SERVER_SHELL_SSH_HOST > ~/.ssh/known_hosts
+      chmod 644 ~/.ssh/known_hosts
+      echo "$CI_BOT_KEY" > ~/.ssh/id_rsa
+      chmod 400 ~/.ssh/id_rsa
+    - |
+      for project in $PROJECTS
+      do
+        response=$(curl --silent --header "PRIVATE-TOKEN: $CI_BOT_TOKEN" "https://cloud.mathcrowd.cn:2444/api/v4/projects?search=$(basename $project)")
+        project_id=$(node -pe "JSON.parse(process.argv[1])[0].id" "$response")
+
+        git clone "git@cloud.mathcrowd.cn:$project.git"
+        cd $(basename $project)
+
+        echo "Updating dependencies for $project\n"
+        CURRENT_VERSION=$(node -p "require('./package-lock.json').packages[\"node_modules/$NPM_PACKAGE_NAME\"].version")
+        if [[ "${CURRENT_VERSION}" == "${NPM_PACKAGE_VERSION}" ]]; then echo "${NPM_PACKAGE_NAME} has already been updated to Version ${NPM_PACKAGE_VERSION}." && exit 0; fi
+        if [[ ! -f .npmrc ]]; then
+          echo 'No .npmrc found! Creating one now. Please review the following link for more information: https://docs.gitlab.com/ee/user/packages/npm_registry/index.html#project-level-npm-endpoint-1'
+          {
+            echo "@${CI_PROJECT_ROOT_NAMESPACE}:registry=${CI_API_V4_URL}/packages/npm/"
+            echo "${CI_API_V4_URL#http*:}/packages/npm/:_authToken=\${CI_JOB_TOKEN}"
+          } >> .npmrc
+        fi
+        npm config set proxy http://192.168.10.100:88
+        npm config set https-proxy http://192.168.10.100:88
+        npm config set registry https://registry.npmjs.org/
+        npm install ${NPM_PACKAGE_NAME}@${NPM_PACKAGE_VERSION} --save  --cache .cache -ddd
+        git checkout -B update-dependencies
+        git add package.json package-lock.json
+        git commit -m "update ${NPM_PACKAGE_NAME} to Version ${NPM_PACKAGE_VERSION}"
+        git push -f --set-upstream origin update-dependencies
+        curl --header "PRIVATE-TOKEN: ${CI_BOT_TOKEN}" --data "assignee_id=2" --data-urlencode "source_branch=update-dependencies" --data-urlencode "target_branch=main" --data-urlencode "title=Update ${NPM_PACKAGE_NAME} to ${NPM_PACKAGE_VERSION}" "https://cloud.mathcrowd.cn:2444/api/v4/projects/$project_id/merge_requests"
+      done
