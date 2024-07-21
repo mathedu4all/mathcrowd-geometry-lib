@@ -147,7 +147,9 @@ export class Line extends Shape<Line> {
 
   /**
    * Get coefficients [A,B,C] of a standard line equation in the form Ax + By = C
-   * @code [A, B, C] = line.standard
+   * ```ts
+   * [A, B, C] = line.standard
+   * ```
    * @returns coefficients [A,B,C]
    */
   get standard(): [number, number, number] {

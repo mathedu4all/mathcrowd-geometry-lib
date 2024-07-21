@@ -5,7 +5,6 @@ yarn-error.log
 .yarn-cache/
 npm-debug.log
 dist/
-docs/
 storybook-static/
 yarn.lock
 .npmrc

@@ -2,7 +2,6 @@ import { Utils } from '..'
 
 /**
  * Config Object supporting read and write.
- * @link Config
  * @example
  * ```js
  * // Get the current tolerance
