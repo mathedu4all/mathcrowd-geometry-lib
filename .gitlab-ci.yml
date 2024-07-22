@@ -7,6 +7,25 @@ stages:
 include:
   - component: cloud.mathcrowd.cn:2444/agile/frontend/frontend-ci/npm-package@13.0
 
+github:
+  stage: post-publish
+  only: 
+    - tags
+  tags:
+    - k8s-runner
+  script:
+    - |
+      git config --global user.email "bot@mathcrowd.cn"
+      git config --global user.name "Gitlab CI Bot"
+      mkdir -p ~/.ssh
+      chmod 700 ~/.ssh
+      ssh-keyscan github.com > ~/.ssh/known_hosts
+      chmod 644 ~/.ssh/known_hosts
+      echo "$GITHUB_KEY" > ~/.ssh/id_rsa
+      chmod 400 ~/.ssh/id_rsa
+      git remote add git@github.com:mathedu4all/mathcrowd-geometry-lib.git
+      git push github
+
 trigger-update:
   stage: post-publish
   only:
