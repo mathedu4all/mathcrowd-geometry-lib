@@ -13,6 +13,16 @@ This project is utilized in our mathematical visualization project for educatina
 - Support affine transform on any shape.
 - Support finding all intersection between any shape.
 
+## Documentation
+
+see https://mathedu4all.github.io/mathcrowd-geometry-lib/
+
+## About Us
+
+Mathcrowd is a startup founded by independent developers and former math educators, specializing in the application of cutting-edge information technology in mathematics education in China. We are dedicated to building an online community for math enthusiasts and self-learners, offering rich, interactive, and visualized math learning content. Our platform provides a space for sharing and discussing mathematical ideas, fostering an engaging and collaborative learning environment.
+
+Official Site: https://www.mathcrowd.cn (Under construction)
+
 ## Copyright and License
 
 Copyright © Mathcrowd ([charles@mathcrowd.cn](mailto:charles@mathcrowd.cn))  
