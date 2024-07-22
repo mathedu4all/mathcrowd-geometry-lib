@@ -5,7 +5,24 @@ stages:
   - publish
   - post-publish
 include:
-  - component: cloud.mathcrowd.cn:2444/agile/frontend/frontend-ci/npm-package@13.0
+  - component: cloud.mathcrowd.cn:2444/agile/frontend/frontend-ci/npm-package@14.0
+
+npm:
+  stage: post-publish
+  only:
+    - tags
+  tags:
+    - k8s-runner
+  script:
+    - |
+        echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+        npm config set proxy http://192.168.10.100:88
+        npm config set https-proxy http://192.168.10.100:88
+        npm config set registry https://registry.npmjs.org/
+        cp -f .npm/package.json .
+        npm install --cache .cache
+        npm run build
+        npm publish --access=public
 
 github:
   stage: post-publish
@@ -14,17 +31,38 @@ github:
   tags:
     - k8s-runner
   script:
-    - |
-      git config --global user.email "bot@mathcrowd.cn"
-      git config --global user.name "Gitlab CI Bot"
-      mkdir -p ~/.ssh
-      chmod 700 ~/.ssh
-      ssh-keyscan github.com > ~/.ssh/known_hosts
-      chmod 644 ~/.ssh/known_hosts
-      echo "$GITHUB_KEY" > ~/.ssh/id_rsa
-      chmod 400 ~/.ssh/id_rsa
-      git remote add git@github.com:mathedu4all/mathcrowd-geometry-lib.git
-      git push github
+    - echo "Setting up SSH directory and permissions..."
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+
+    - echo "Adding GitHub and CI server SSH hosts to known_hosts..."
+    - ssh-keyscan github.com > ~/.ssh/known_hosts
+    - ssh-keyscan $CI_SERVER_SHELL_SSH_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+
+    - echo "Adding private keys to SSH..."
+    - echo "$GITHUB_KEY" > ~/.ssh/github.key
+    - chmod 400 ~/.ssh/github.key
+    - echo "$CI_BOT_KEY" > ~/.ssh/id_rsa
+    - chmod 400 ~/.ssh/id_rsa
+
+    - echo "Setting HTTP and HTTPS proxy..."
+    - git config --global http.proxy http://192.168.10.100:88
+    - git config --global https.proxy http://192.168.10.100:88
+
+    - echo "Cloning the repository..."
+    - cd /tmp
+    - git clone git@cloud.mathcrowd.cn:agile/frontend/mathcrowd-geometry-lib.git
+
+    - echo "Changing to repository directory..."
+    - cd mathcrowd-geometry-lib
+
+    - echo "Adding GitHub remote repository..."
+    - git remote add github git@github.com:mathedu4all/mathcrowd-geometry-lib.git
+
+    - echo "Pushing to GitHub..."
+    - GIT_TRACE=1 GIT_CURL_VERBOSE=1 GIT_SSH_COMMAND='ssh -i ~/.ssh/github.key' git push github
+
 
 trigger-update:
   stage: post-publish
