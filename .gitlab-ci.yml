@@ -5,7 +5,23 @@ stages:
   - publish
   - post-publish
 include:
-  - component: cloud.mathcrowd.cn:2444/agile/frontend/frontend-ci/npm-package@13.0
+  - component: cloud.mathcrowd.cn:2444/agile/frontend/frontend-ci/npm-package@14.0
+
+npm:
+  stage: post-publish
+  only:
+    - tags
+  tags:
+    - k8s-runner
+  script:
+    - |
+        echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+        npm config set proxy http://192.168.10.100:88
+        npm config set https-proxy http://192.168.10.100:88
+        npm config set registry https://registry.npmjs.org/
+        npm install --cache .cache --prefix .npm
+        npm build --prefix .npm
+        npm publish --prefix .npm
 
 github:
   stage: post-publish
@@ -15,16 +31,29 @@ github:
     - k8s-runner
   script:
     - |
-      git config --global user.email "bot@mathcrowd.cn"
-      git config --global user.name "Gitlab CI Bot"
-      mkdir -p ~/.ssh
-      chmod 700 ~/.ssh
-      ssh-keyscan github.com > ~/.ssh/known_hosts
-      chmod 644 ~/.ssh/known_hosts
-      echo "$GITHUB_KEY" > ~/.ssh/id_rsa
-      chmod 400 ~/.ssh/id_rsa
-      git remote add git@github.com:mathedu4all/mathcrowd-geometry-lib.git
-      git push github
+        # Setup SSH directory and permissions
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+
+        # Add GitHub to known hosts to avoid prompt on first connection
+        ssh-keyscan github.com > ~/.ssh/known_hosts
+        chmod 644 ~/.ssh/known_hosts
+
+        # Add the private key to SSH
+        echo "$GITHUB_KEY" > ~/.ssh/github.key
+        chmod 400 ~/.ssh/github.key
+
+        # Set HTTP proxy
+        git config --global http.proxy http://192.168.10.100:88
+
+        # Set HTTPS proxy
+        git config --global https.proxy http://192.168.10.100:88
+
+        # Set the remote repository URL for GitHub
+        git remote add github git@github.com:mathedu4all/mathcrowd-geometry-lib.git
+        git fetch origin main
+        GIT_SSH_COMMAND='ssh -i ~/.ssh/github.key' git fetch github main
+        GIT_SSH_COMMAND='ssh -i ~/.ssh/github.key' git push github main
 
 trigger-update:
   stage: post-publish
