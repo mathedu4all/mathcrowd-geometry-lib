@@ -23,7 +23,6 @@ npm:
         sed -i 's|@agile/mathcrowd-geometry-lib|@mathcrowd/mathcrowd-geometry-lib|g' package.json
         sed -i 's|https://cloud.mathcrowd.cn:2444/api/v4/projects/68/packages/npm/|https://registry.npmjs.org/|g' package.json
         sed -i 's|https://cloud.mathcrowd.cn:2444/agile/frontend/mathcrowd-geometry-lib.git|https://github.com/mathedu4all/mathcrowd-geometry-lib.git|g' package.json
-        npm publish --access=public
     - |
       NPM_PACKAGE_NAME=$(node -p "require('./package.json').name")
       NPM_PACKAGE_VERSION=$(node -p "require('./package.json').version")  
@@ -62,7 +61,7 @@ github:
     - git remote add github git@github.com:mathedu4all/mathcrowd-geometry-lib.git
 
     - echo "Pushing to GitHub..."
-    - GIT_TRACE=1 GIT_CURL_VERBOSE=1 GIT_SSH_COMMAND='ssh -i ~/.ssh/github.key' git push github HEAD:main
+    - GIT_TRACE=1 GIT_CURL_VERBOSE=1 GIT_SSH_COMMAND='ssh -i ~/.ssh/github.key' git push -f head:main 
 
 
 trigger-update:
