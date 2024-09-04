@@ -37,7 +37,7 @@ npm:
 github:
   stage: post-publish
   only: 
-    - tags
+    - main
   tags:
     - k8s-runner
   script:
@@ -61,8 +61,7 @@ github:
     - git remote add github git@github.com:mathedu4all/mathcrowd-geometry-lib.git
 
     - echo "Pushing to GitHub..."
-    - GIT_TRACE=1 GIT_CURL_VERBOSE=1 GIT_SSH_COMMAND='ssh -i ~/.ssh/github.key' git push -f head:main 
-
+    - GIT_TRACE=1 GIT_CURL_VERBOSE=1 GIT_SSH_COMMAND='ssh -i ~/.ssh/github.key' git push -f github HEAD:main
 
 trigger-update:
   stage: post-publish
