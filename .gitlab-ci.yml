@@ -19,7 +19,10 @@ npm:
         npm config set proxy http://192.168.10.100:88
         npm config set https-proxy http://192.168.10.100:88
         npm config set registry https://registry.npmjs.org/
-        cp -f .npm/package.json .
+        echo "*.map" > .npmignore
+        sed -i 's|@agile/mathcrowd-geometry-lib|@mathcrowd/mathcrowd-geometry-lib|g' package.json
+        sed -i 's|https://cloud.mathcrowd.cn:2444/api/v4/projects/68/packages/npm/|https://registry.npmjs.org/|g' package.json
+        sed -i 's|https://cloud.mathcrowd.cn:2444/agile/frontend/mathcrowd-geometry-lib.git|https://github.com/mathedu4all/mathcrowd-geometry-lib.git|g' package.json
         npm install --cache .cache
         npm run build
         npm publish --access=public
