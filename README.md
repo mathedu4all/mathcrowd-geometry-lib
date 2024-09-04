@@ -13,6 +13,27 @@ This project is utilized in our mathematical visualization project for educatina
 - Support affine transform on any shape.
 - Support finding all intersection between any shape.
 
+## Install
+
+```
+npm i @mathcrowd/mathcrowd-geometry-lib
+```
+
+## Usage
+
+```javascript
+import {
+  Circle
+} from '@mathcrowd/mathcrowd-geometry-lib'
+
+const pt = new Point(0, 1)
+const circle = new Circle(new Point(0, 0), 2)
+
+if(circle.contains(pt)){
+  console.log("Circle contains the point.)
+}
+```
+
 ## Documentation
 
 see https://mathedu4all.github.io/mathcrowd-geometry-lib/
