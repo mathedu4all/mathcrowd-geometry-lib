@@ -8,9 +8,9 @@ include:
   - component: cloud.mathcrowd.cn:2444/agile/frontend/frontend-ci/npm-package@14.0
 
 npm:
-  stage: post-publish
+  stage: publish
   only:
-    - tags
+    - main
   tags:
     - k8s-runner
   script:
@@ -19,13 +19,21 @@ npm:
         npm config set proxy http://192.168.10.100:88
         npm config set https-proxy http://192.168.10.100:88
         npm config set registry https://registry.npmjs.org/
-        echo "*.map" > .npmignore
+        echo "*.map" >> .npmignore
         sed -i 's|@agile/mathcrowd-geometry-lib|@mathcrowd/mathcrowd-geometry-lib|g' package.json
         sed -i 's|https://cloud.mathcrowd.cn:2444/api/v4/projects/68/packages/npm/|https://registry.npmjs.org/|g' package.json
         sed -i 's|https://cloud.mathcrowd.cn:2444/agile/frontend/mathcrowd-geometry-lib.git|https://github.com/mathedu4all/mathcrowd-geometry-lib.git|g' package.json
-        npm install --cache .cache
-        npm run build
         npm publish --access=public
+    - |
+      NPM_PACKAGE_NAME=$(node -p "require('./package.json').name")
+      NPM_PACKAGE_VERSION=$(node -p "require('./package.json').version")  
+
+      if [[ "$(npm view ${NPM_PACKAGE_NAME} versions)" != *"'${NPM_PACKAGE_VERSION}'"* ]]; then
+        npm publish --access=public
+        echo "Successfully published version ${NPM_PACKAGE_VERSION} of ${NPM_PACKAGE_NAME} to npmjs registry."
+      else
+        echo "Version ${NPM_PACKAGE_VERSION} of ${NPM_PACKAGE_NAME} has already been published, so no new version has been published."
+      fi
 
 github:
   stage: post-publish
@@ -40,31 +48,21 @@ github:
 
     - echo "Adding GitHub and CI server SSH hosts to known_hosts..."
     - ssh-keyscan github.com > ~/.ssh/known_hosts
-    - ssh-keyscan $CI_SERVER_SHELL_SSH_HOST >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
 
     - echo "Adding private keys to SSH..."
     - echo "$GITHUB_KEY" > ~/.ssh/github.key
     - chmod 400 ~/.ssh/github.key
-    - echo "$CI_BOT_KEY" > ~/.ssh/id_rsa
-    - chmod 400 ~/.ssh/id_rsa
 
     - echo "Setting HTTP and HTTPS proxy..."
     - git config --global http.proxy http://192.168.10.100:88
     - git config --global https.proxy http://192.168.10.100:88
 
-    - echo "Cloning the repository..."
-    - cd /tmp
-    - git clone git@cloud.mathcrowd.cn:agile/frontend/mathcrowd-geometry-lib.git
-
-    - echo "Changing to repository directory..."
-    - cd mathcrowd-geometry-lib
-
     - echo "Adding GitHub remote repository..."
     - git remote add github git@github.com:mathedu4all/mathcrowd-geometry-lib.git
 
     - echo "Pushing to GitHub..."
-    - GIT_TRACE=1 GIT_CURL_VERBOSE=1 GIT_SSH_COMMAND='ssh -i ~/.ssh/github.key' git push github
+    - GIT_TRACE=1 GIT_CURL_VERBOSE=1 GIT_SSH_COMMAND='ssh -i ~/.ssh/github.key' git push github HEAD:main
 
 
 trigger-update:
