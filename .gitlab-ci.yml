@@ -74,7 +74,7 @@ trigger-update:
     - |
       NPM_PACKAGE_NAME=$(node -p "require('./package.json').name")
       NPM_PACKAGE_VERSION=$(node -p "require('./package.json').version")
-      PROJECTS=agile/frontend/pixi-react-lib
+      PROJECTS="agile/frontend/pixi-react-lib"
       git config --global user.email "bot@mathcrowd.cn"
       git config --global user.name "Gitlab CI Bot"
       mkdir -p ~/.ssh
