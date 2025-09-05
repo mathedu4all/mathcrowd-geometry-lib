@@ -1,20 +1,48 @@
-## Description
-This merge request addresses, and describe the problem or user story being addressed.
+## 📋 功能描述
+简要描述本次MR的主要功能和变更
 
-## Changes Made
-Provide code snippets or screenshots as needed.
+## 🔗 相关Issue
+Closes #123
+Related to #456
 
-## Related Issues
-Provide links to the related issues or feature requests.
+## 🏷️ 变更类型
+- [ ] ✨ 新功能
+- [ ] 🐛 Bug修复
+- [ ] 📝 文档更新
+- [ ] ♻️ 代码重构
+- [ ] ⚡ 性能优化
+- [ ] 🔒 安全修复
+- [ ] 🎨 UI/样式更新
+- [ ] ⬆️ 依赖升级
+- [ ] 🗑️ 代码删除
+- [ ] ❓ 其他
 
-## Additional Notes
-Include any extra information or considerations for reviewers, such as impacted areas of the codebase.
+## 🧪 测试
+- [ ] 单元测试已通过
+- [ ] 集成测试已通过
+- [ ] 手动测试已完成
+- [ ] 回归测试已完成
+- [ ] 性能测试已完成（如适用）
 
-## Merge Request Checklists
+## 📸 截图/演示
+如果有UI变更，请提供前后对比截图
 
+## 🔍 检查清单
+- [ ] 代码符合项目规范
+- [ ] 已添加/更新相关文档
+- [ ] 已添加必要的测试
+- [ ] 已考虑向后兼容性
+- [ ] 无硬编码配置
+- [ ] 错误处理完整
+- [ ] 日志记录适当
+- [ ] 安全性已评估
 
- - [ ]  Code follows project coding guidelines.
+## 🎯 部署注意事项
+- [ ] 需要数据库迁移
+- [ ] 需要配置文件更新
+- [ ] 需要环境变量添加
+- [ ] 需要重启服务
+- [ ] 无特殊部署要求
 
- - [ ]  Documentation reflects the changes made.
-
- - [ ]  I have already covered the unit testing.
+## 📚 补充说明
+其他需要审查者关注的重要信息
